@@ -217,6 +217,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .fannav .fc p{margin:6px 0 0;font-size:13.5px;color:#cfc7d6;min-height:2.6em}
 .fannav .fc i{display:block;font-style:normal;font-size:11px;letter-spacing:.2em;color:var(--mute);margin-top:4px}
 @media (max-width:640px){.chgrid.fan{--w:160px}.fannav .fc{min-width:0;flex:1}}
+.nitem{cursor:pointer;transition:transform .2s,border-color .2s}.nitem:hover,.nitem:focus-visible{transform:translateY(-3px);border-color:rgba(227,194,122,.5);outline:none}
+.nmore{display:inline-block;margin-top:12px;font-size:13px;color:#e3c27a}
+.nmodal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,3,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .25s}
+.nmodal.on{opacity:1}
+.nmodal .nbox{position:relative;width:min(640px,100%);max-height:86vh;overflow:auto;background:#0f0d16;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:34px 30px 30px;box-shadow:0 30px 90px -20px #000;transform:translateY(14px);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.nmodal.on .nbox{transform:none}
+.nmodal time{font-size:14px;color:#e3c27a;font-weight:700}
+.nmodal h3{font-size:clamp(22px,4vw,28px);font-weight:900;margin:10px 0 18px;line-height:1.35}
+.nmodal .nb p{font-size:15.5px;line-height:1.8;color:#d6cfdc;margin:0 0 14px}
+.nmodal .nx{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:transparent;color:#eee;font-size:20px;cursor:pointer}
+.nmodal .nx:hover{border-color:#e3c27a;color:#e3c27a}
 </style>
 </head>
 <body>
@@ -272,7 +283,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 <section id="news" style="padding-top:0"><div class="wrap">
  <div class="rise"><p class="eyebrow">공지사항</p><h2>새 소식</h2></div>
  <ol class="log">
-  <li class="rise"><time datetime="2026-10-18">2026.10.18</time><b><span class="ntag">공지</span>EAST SAGA 10월 25일 출시 예정</b><p>2026년 10월 25일, EAST SAGA를 정식으로 선보입니다.</p></li>
+  <li class="rise nitem" tabindex="0" role="button" aria-haspopup="dialog"><time datetime="2026-10-18">2026.10.18</time><b><span class="ntag">공지</span>EAST SAGA 10월 25일 출시 예정</b><p>2026년 10월 25일, EAST SAGA를 정식으로 선보입니다.</p><span class="nmore">자세히 보기 →</span><div class="nbody" hidden>
+<p>안녕하세요, SAGATON Studio입니다.</p>
+<p>첫 작품 <b>EAST SAGA</b>가 <b>2026년 10월 25일</b> 정식 출시됩니다.</p>
+<p>EAST SAGA는 청구(한국)·요로즈(일본)·곤륜(중국), 세 나라의 신화 속 존재들이 한 판 위에서 맞붙는 전략 카드 배틀입니다. 진영마다 15명, 모두 45명의 캐릭터 가운데 6명을 골라 파티를 꾸리고, 4×2 전장에서 동시에 명령을 내려 싸웁니다.</p>
+<p>출시 전에도 지금 바로 플레이해 볼 수 있습니다. 처음이라면 로비의 <b>튜토리얼</b>로 규칙을 익혀 보세요.</p>
+<p>업데이트·점검·이벤트 소식은 이 공지사항에서 알려 드리겠습니다.</p>
+<p>감사합니다.<br>SAGATON Studio 드림</p>
+<p><a class="btn pri" href="https://eastsaga.github.io/" style="display:inline-flex;margin-top:6px">▶ EAST SAGA 플레이</a></p>
+</div></li>
  </ol></div></section>
 
 <section id="team" style="padding-top:0"><div class="wrap">
@@ -341,6 +360,17 @@ document.querySelectorAll('.chgrid').forEach(function(g){var cs=[].slice.call(g.
  g.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){e.preventDefault();stop();pos+=e.deltaX/sp();lay();clearTimeout(g._w);g._w=setTimeout(function(){tween(Math.round(pos));},140);}},{passive:false});
  addEventListener('resize',lay);document.querySelectorAll('.rtab').forEach(function(t){t.addEventListener('click',function(){setTimeout(lay,30);});});lay();});
 })();
+</script>
+<script>
+(function(){var open=null;
+function show(li){var m=document.createElement('div');m.className='nmodal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');
+ var t=li.querySelector('time').outerHTML,h=li.querySelector('b').innerHTML,body=li.querySelector('.nbody').innerHTML;
+ m.innerHTML='<div class="nbox"><button class="nx" aria-label="닫기">✕</button>'+t+'<h3>'+h+'</h3><div class="nb">'+body+'</div></div>';
+ document.body.appendChild(m);document.body.style.overflow='hidden';requestAnimationFrame(function(){m.classList.add('on');});open={m:m,li:li};m.querySelector('.nx').focus();
+ m.addEventListener('click',function(e){if(e.target===m||e.target.closest('.nx'))close();});}
+function close(){if(!open)return;var o=open;open=null;o.m.classList.remove('on');document.body.style.overflow='';setTimeout(function(){o.m.remove();},250);o.li.focus();}
+document.querySelectorAll('.nitem').forEach(function(li){li.addEventListener('click',function(e){if(e.target.closest('a'))return;show(li);});li.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(li);}});});
+addEventListener('keydown',function(e){if(e.key==='Escape')close();});})();
 </script>
 </body>
 </html>
