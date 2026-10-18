@@ -314,7 +314,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 document.querySelectorAll('.chgrid').forEach(function(g){var cs=[].slice.call(g.children);if(!cs.length)return;g.classList.add('fan');g.tabIndex=0;g.setAttribute('aria-label','캐릭터 카드, 좌우로 넘겨 보기');
  var c0=getComputedStyle(cs[0]).getPropertyValue('--c')||'';var nav=document.createElement('div');nav.className='fannav';nav.style.setProperty('--c',cs[0].style.getPropertyValue('--c'));
  nav.innerHTML='<button type="button" aria-label="이전 카드">‹</button><div class="fc" aria-live="polite"><b></b><span></span><p></p><i></i></div><button type="button" aria-label="다음 카드">›</button>';g.after(nav);
- var a=Math.floor(cs.length/2),n=cs.length;
+ var n=cs.length,a=Math.floor(n/2),F=['화랑 검무사','키츠네 술사','빙한 선자'];cs.forEach(function(c,i){var im=c.querySelector('img');if(im&&F.indexOf(im.alt)>=0)a=i;});
  function lay(){var w=cs[0].offsetWidth||200,sp=w*(innerWidth<640?.34:.42),mx=innerWidth<640?2:3;
   cs.forEach(function(c,i){var d=i-a;if(d>n/2)d-=n;if(d<-n/2)d+=n;var ad=Math.abs(d),vis=ad<=mx;
    c.classList.toggle('act',d===0);c.style.zIndex=20-ad;c.style.opacity=vis?1:0;c.style.pointerEvents=vis?'auto':'none';c.style.filter=d?'brightness(.55) saturate(.8)':'none';
