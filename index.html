@@ -198,6 +198,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 #team h2.lpt{font-family:var(--f-disp);font-weight:900;font-size:clamp(34px,7vw,88px);letter-spacing:-.03em;line-height:1}
 
 /* 부채꼴 카드 */
+.chgrid.fan .ch{transition:none!important}.chgrid.fan{cursor:grab}.chgrid.fan.drag{cursor:grabbing}.chgrid.fan img{pointer-events:none;-webkit-user-drag:none}
 .chgrid.fan .ct p{display:none!important}
 #worlds{overflow-x:clip}
 .chgrid.fan{--w:clamp(150px,19vw,240px);display:block!important;position:relative;height:calc(var(--w)*1.36 + 110px);overflow:visible;margin-top:8px;touch-action:pan-y;user-select:none;-webkit-user-select:none;outline:none}
@@ -311,20 +312,33 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 <script>
 (function(){var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-document.querySelectorAll('.chgrid').forEach(function(g){var cs=[].slice.call(g.children);if(!cs.length)return;g.classList.add('fan');g.tabIndex=0;g.setAttribute('aria-label','캐릭터 카드, 좌우로 넘겨 보기');
- var c0=getComputedStyle(cs[0]).getPropertyValue('--c')||'';var nav=document.createElement('div');nav.className='fannav';nav.style.setProperty('--c',cs[0].style.getPropertyValue('--c'));
+document.querySelectorAll('.chgrid').forEach(function(g){var cs=[].slice.call(g.children);if(!cs.length)return;g.classList.add('fan');g.tabIndex=0;g.setAttribute('aria-label','캐릭터 카드, 좌우로 끌어서 돌려 보기');
+ var nav=document.createElement('div');nav.className='fannav';nav.style.setProperty('--c',cs[0].style.getPropertyValue('--c'));
  nav.innerHTML='<button type="button" aria-label="이전 카드">‹</button><div class="fc" aria-live="polite"><b></b><span></span><p></p><i></i></div><button type="button" aria-label="다음 카드">›</button>';g.after(nav);
  var n=cs.length,a=Math.floor(n/2),F=['화랑 검무사','키츠네 술사','빙한 선자'];cs.forEach(function(c,i){var im=c.querySelector('img');if(im&&F.indexOf(im.alt)>=0)a=i;});
- function lay(){var w=cs[0].offsetWidth||200,sp=w*(innerWidth<640?.34:.42),mx=innerWidth<640?2:3;
-  cs.forEach(function(c,i){var d=i-a;if(d>n/2)d-=n;if(d<-n/2)d+=n;var ad=Math.abs(d),vis=ad<=mx;
-   c.classList.toggle('act',d===0);c.style.zIndex=20-ad;c.style.opacity=vis?1:0;c.style.pointerEvents=vis?'auto':'none';c.style.filter=d?'brightness(.55) saturate(.8)':'none';
-   c.style.transform='translateX('+(d*sp)+'px) translateY('+(ad*ad*6+(d?ad*8:-10))+'px) rotate('+(d*7)+'deg) scale('+(d?.9:1.06)+')';});
-  var c=cs[a],ct=c.querySelector('.ct');nav.querySelector('b').textContent=ct.querySelector('b').textContent;nav.querySelector('span').textContent=ct.querySelector('span').textContent;var p=ct.querySelector('p');nav.querySelector('p').textContent=p?p.textContent:'';nav.querySelector('i').textContent=(a+1)+' / '+n;}
- function go(k){a=(a+k+n)%n;lay();}
+ var pos=a,shown=-1,anim=null;
+ function sp(){var w=cs[0].offsetWidth||200;return w*(innerWidth<640?.34:.42);}
+ function wrap(d){d=((d%n)+n)%n;if(d>n/2)d-=n;return d;}
+ function lay(){var S=sp(),mx=innerWidth<640?2.6:3.6;
+  cs.forEach(function(c){var i=cs.indexOf(c),d=wrap(i-pos),ad=Math.abs(d),vis=ad<=mx,k=Math.min(ad,1);
+   c.classList.toggle('act',ad<.5);c.style.zIndex=Math.round(100-ad*10);c.style.opacity=vis?Math.min(1,(mx-ad)*1.6):0;c.style.pointerEvents=vis?'auto':'none';
+   c.style.filter='brightness('+(1-.45*k)+') saturate('+(1-.2*k)+')';
+   c.style.transform='translateX('+(d*S)+'px) translateY('+(ad*ad*6+k*ad*8-(1-k)*10)+'px) rotate('+(d*7)+'deg) scale('+(1.06-.16*k)+')';});
+  var cur=((Math.round(pos)%n)+n)%n;if(cur!==shown){shown=cur;var ct=cs[cur].querySelector('.ct');nav.querySelector('b').textContent=ct.querySelector('b').textContent;nav.querySelector('span').textContent=ct.querySelector('span').textContent;var p=ct.querySelector('p');nav.querySelector('p').textContent=p?p.textContent:'';nav.querySelector('i').textContent=(cur+1)+' / '+n;}}
+ function stop(){if(anim){cancelAnimationFrame(anim);anim=null;}}
+ function tween(to){stop();var from=pos,t0=performance.now(),D=reduce?1:420;(function f(t){var u=Math.min(1,(t-t0)/D),e=1-Math.pow(1-u,3);pos=from+(to-from)*e;lay();if(u<1)anim=requestAnimationFrame(f);else{anim=null;}})(t0);}
+ function glide(v){stop();var last=performance.now();(function f(t){var dt=Math.min(40,t-last);last=t;pos+=v*dt;v*=Math.pow(.994,dt);lay();if(Math.abs(v)>.0015)anim=requestAnimationFrame(f);else tween(Math.round(pos));})(last);}
+ function go(k){tween(Math.round(pos)+k);}
  nav.children[0].onclick=function(){go(-1)};nav.children[2].onclick=function(){go(1)};
- cs.forEach(function(c,i){c.addEventListener('click',function(){if(i!==a){a=i;lay();}});});
  g.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){go(-1);e.preventDefault();}if(e.key==='ArrowRight'){go(1);e.preventDefault();}});
- var sx=null;g.addEventListener('pointerdown',function(e){sx=e.clientX;});g.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40)go(dx<0?1:-1);});
+ var drag=null;
+ g.addEventListener('pointerdown',function(e){if(e.pointerType==='mouse')e.preventDefault();stop();drag={x:e.clientX,p:pos,t:performance.now(),v:0,lx:e.clientX,moved:false,tgt:e.target.closest('.ch')};g.classList.add('drag');try{g.setPointerCapture(e.pointerId);}catch(_){}});
+ g.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x;if(Math.abs(dx)>5)drag.moved=true;var now=performance.now(),dt=Math.max(1,now-drag.t);drag.v=-(e.clientX-drag.lx)/sp()/dt*.9+drag.v*.1;drag.lx=e.clientX;drag.t=now;pos=drag.p-dx/sp();lay();});
+ function up(e){if(!drag)return;var d=drag;drag=null;g.classList.remove('drag');
+  if(!d.moved){if(d.tgt){var i=cs.indexOf(d.tgt);tween(Math.round(pos)+wrap(i-pos));}else tween(Math.round(pos));return;}
+  if(performance.now()-d.t>90)d.v=0;if(Math.abs(d.v)>.002&&!reduce)glide(d.v);else tween(Math.round(pos));}
+ g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up);
+ g.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){e.preventDefault();stop();pos+=e.deltaX/sp();lay();clearTimeout(g._w);g._w=setTimeout(function(){tween(Math.round(pos));},140);}},{passive:false});
  addEventListener('resize',lay);document.querySelectorAll('.rtab').forEach(function(t){t.addEventListener('click',function(){setTimeout(lay,30);});});lay();});
 })();
 </script>
