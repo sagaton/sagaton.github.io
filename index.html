@@ -196,6 +196,26 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .em{display:inline-block;margin-top:10px;font-size:14px;color:#e3c27a;text-decoration:none;border-bottom:1px solid rgba(227,194,122,.35);word-break:break-all}.em:hover{color:#fff;border-color:#fff}.cbox .v .em{margin-top:0;font-size:inherit}
 .ntag{display:inline-block;margin-right:8px;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;vertical-align:2px;background:rgba(227,194,122,.16);color:#e3c27a;border:1px solid rgba(227,194,122,.4)}
 #team h2.lpt{font-family:var(--f-disp);font-weight:900;font-size:clamp(34px,7vw,88px);letter-spacing:-.03em;line-height:1}
+
+/* 부채꼴 카드 */
+.chgrid.fan .ct p{display:none!important}
+#worlds{overflow-x:clip}
+.chgrid.fan{--w:clamp(150px,19vw,240px);display:block!important;position:relative;height:calc(var(--w)*1.36 + 110px);overflow:visible;margin-top:8px;touch-action:pan-y;user-select:none;-webkit-user-select:none;outline:none}
+.chgrid.fan .ch{position:absolute;left:50%;top:44px;width:var(--w);height:calc(var(--w)*1.36);margin-left:calc(var(--w)/-2);transform-origin:50% 150%;transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .45s,filter .45s,box-shadow .4s;cursor:pointer;will-change:transform}
+.chgrid.fan .ch:hover{box-shadow:0 0 0 1px var(--line)}
+.chgrid.fan .ch.act{box-shadow:0 0 0 2px var(--c),0 30px 70px -18px var(--c);cursor:default}
+.chgrid.fan .ch:not(.act) .ct span{display:none}.chgrid.fan .ch.act .ct{display:none}
+.chgrid.fan .ch:not(.act) .ct b{font-size:13px}
+.chgrid.fan .ch:hover img{transform:none}
+.fannav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:6px}
+.fannav button{font:inherit;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font-size:20px;cursor:pointer;transition:all .2s}
+.fannav button:hover{border-color:var(--c);color:var(--c)}
+.fannav .fc{min-width:220px;text-align:center}
+.fannav .fc b{display:block;font-size:20px;font-weight:900}
+.fannav .fc span{display:block;font-size:13px;color:var(--c);margin-top:2px}
+.fannav .fc p{margin:6px 0 0;font-size:13.5px;color:#cfc7d6;min-height:2.6em}
+.fannav .fc i{display:block;font-style:normal;font-size:11px;letter-spacing:.2em;color:var(--mute);margin-top:4px}
+@media (max-width:640px){.chgrid.fan{--w:160px}.fannav .fc{min-width:0;flex:1}}
 </style>
 </head>
 <body>
@@ -288,5 +308,25 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 })();
 </script>
 
+
+<script>
+(function(){var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.querySelectorAll('.chgrid').forEach(function(g){var cs=[].slice.call(g.children);if(!cs.length)return;g.classList.add('fan');g.tabIndex=0;g.setAttribute('aria-label','캐릭터 카드, 좌우로 넘겨 보기');
+ var c0=getComputedStyle(cs[0]).getPropertyValue('--c')||'';var nav=document.createElement('div');nav.className='fannav';nav.style.setProperty('--c',cs[0].style.getPropertyValue('--c'));
+ nav.innerHTML='<button type="button" aria-label="이전 카드">‹</button><div class="fc" aria-live="polite"><b></b><span></span><p></p><i></i></div><button type="button" aria-label="다음 카드">›</button>';g.after(nav);
+ var a=Math.floor(cs.length/2),n=cs.length;
+ function lay(){var w=cs[0].offsetWidth||200,sp=w*(innerWidth<640?.34:.42),mx=innerWidth<640?2:3;
+  cs.forEach(function(c,i){var d=i-a;if(d>n/2)d-=n;if(d<-n/2)d+=n;var ad=Math.abs(d),vis=ad<=mx;
+   c.classList.toggle('act',d===0);c.style.zIndex=20-ad;c.style.opacity=vis?1:0;c.style.pointerEvents=vis?'auto':'none';c.style.filter=d?'brightness(.55) saturate(.8)':'none';
+   c.style.transform='translateX('+(d*sp)+'px) translateY('+(ad*ad*6+(d?ad*8:-10))+'px) rotate('+(d*7)+'deg) scale('+(d?.9:1.06)+')';});
+  var c=cs[a],ct=c.querySelector('.ct');nav.querySelector('b').textContent=ct.querySelector('b').textContent;nav.querySelector('span').textContent=ct.querySelector('span').textContent;var p=ct.querySelector('p');nav.querySelector('p').textContent=p?p.textContent:'';nav.querySelector('i').textContent=(a+1)+' / '+n;}
+ function go(k){a=(a+k+n)%n;lay();}
+ nav.children[0].onclick=function(){go(-1)};nav.children[2].onclick=function(){go(1)};
+ cs.forEach(function(c,i){c.addEventListener('click',function(){if(i!==a){a=i;lay();}});});
+ g.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){go(-1);e.preventDefault();}if(e.key==='ArrowRight'){go(1);e.preventDefault();}});
+ var sx=null;g.addEventListener('pointerdown',function(e){sx=e.clientX;});g.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40)go(dx<0?1:-1);});
+ addEventListener('resize',lay);document.querySelectorAll('.rtab').forEach(function(t){t.addEventListener('click',function(){setTimeout(lay,30);});});lay();});
+})();
+</script>
 </body>
 </html>
