@@ -49,6 +49,13 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
 #joy{position:fixed;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.7);pointer-events:none;display:none}
 #joy i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 3px 0 rgba(0,0,0,.15)}
 @media (max-height:520px){#title h1{font-size:40px}.pick canvas{width:52px;height:34px}.pick button{min-width:62px;font-size:13px}.btn{font-size:18px;padding:7px 24px}#talk{min-height:76px;padding:8px 12px 8px 92px}#talk canvas{width:80px;height:64px}#talk p{font-size:16px}.panel{padding:10px}.panel h2{font-size:24px}.shop button{width:80px}.shop button canvas{height:34px}}
+#buyAsk{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(10,40,80,.45)}#buyAsk.hide{display:none}
+#buyAsk .bx{background:#fff;border:4px solid var(--ink);border-radius:28px;padding:20px 26px 22px;text-align:center;box-shadow:0 8px 0 var(--ink);min-width:280px;max-width:86vw;animation:bpop .25s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bpop{from{transform:scale(.6);opacity:0}}
+#buyAsk canvas{width:168px;height:138px;display:block;margin:0 auto}
+#buyAsk .bq{font-size:26px;color:var(--ink);margin:6px 0 4px}#buyAsk .bc{font-size:18px;color:#3c6688;margin-bottom:16px}
+#buyAsk .bb{display:flex;gap:12px;justify-content:center}#buyAsk button{font:inherit;font-size:20px;padding:10px 22px;border-radius:999px;border:3px solid var(--ink);cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+#buyAsk .by{background:#ffe27a;color:#3a2a00}#buyAsk .bn{background:#fff;color:var(--ink)}#buyAsk button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
 </style></head><body>
 <canvas id="c"></canvas>
 <div id="title"><div><h1>퐁당 하루</h1><div class="ser pill">하루 시리즈 · 첫 번째 이야기</div></div>
@@ -181,8 +188,12 @@ function drawDeco(g,id,cx,cy,s,t){g.save();g.translate(cx,cy);g.scale(s,s);g.lin
  if(id==='chest'){P(()=>{g.beginPath();g.rect(-30,-6,60,34);},'#b8763f');P(()=>{g.beginPath();g.moveTo(-30,-6);g.quadraticCurveTo(0,-34,30,-6);g.closePath();},'#cf8a4c');P(()=>{g.beginPath();g.rect(-6,-4,12,12);},'#ffd34d');g.fillStyle='rgba(255,230,120,'+(.5+Math.sin(t*3)*.3)+')';g.beginPath();g.arc(20,-24,4,0,7);g.arc(-18,-28,3,0,7);g.fill();}
  g.restore();}
 function openHome(){showTitle(false);MODE='home';$('homeUI').classList.remove('hide');buildShop();}
+function askBuy(d,ok){const m=$('buyAsk');const cv=m.querySelector('canvas');const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);drawDeco(g,d.id,cv.width/2,cv.height*.58,1.5,0);
+ const jo=(c=>{const k=c.charCodeAt(c.length-1)-44032;return k>=0&&k<11172&&k%28?'을':'를';})(d.n);
+ m.querySelector('.bq').innerHTML='<b>'+d.n+'</b>'+jo+' 살까요?';m.querySelector('.bc').innerHTML=d.cost?'🐚 조개 <b>'+d.cost+'</b>개 → 남는 조개 '+(save.shells-d.cost)+'개':'무료예요!';
+ m.classList.remove('hide');const close=()=>m.classList.add('hide');m.querySelector('.by').onclick=()=>{close();ok();};m.querySelector('.bn').onclick=close;m.onclick=e=>{if(e.target===m)close();};}
 function buildShop(){$('hShell').textContent=save.shells;const s=$('shop');s.innerHTML='';for(const d of DECO){const own=!!save.deco[d.id];const b=document.createElement('button');b.className=own?'own':(save.shells<d.cost?'no':'');const cv=document.createElement('canvas');cv.width=112;cv.height=92;const g=cv.getContext('2d');drawDeco(g,d.id,56,52,1,0);b.appendChild(cv);b.insertAdjacentHTML('beforeend',d.n+'<br>'+(own?'✔ 꾸몄어요':'🐚 '+d.cost));
-  b.onclick=()=>{if(own)return;if(save.shells<d.cost){toast('조개가 부족해요');return;}save.shells-=d.cost;save.deco[d.id]=1;store();toast(d.n+' 꾸미기 완료!');buildShop();};s.appendChild(b);}}
+  b.onclick=()=>{if(own)return;if(save.shells<d.cost){toast('조개가 '+(d.cost-save.shells)+'개 부족해요');return;}askBuy(d,()=>{save.shells-=d.cost;save.deco[d.id]=1;store();toast(d.n+' 꾸미기 완료!');buildShop();});};s.appendChild(b);}}
 $('homeBack').onclick=()=>{$('homeUI').classList.add('hide');showTitle(true);};
 function drawHome(){x.fillStyle='#5fb6ea';x.fillRect(0,0,W,H);layer(BGI.far,0,H,0);const mh=Math.min(H*.25,W*.42);layer(BGI.mid,0,mh,H-mh);
  const hi=BGI.house,hh=Math.min(H*.55,W*.5),hw=hi.naturalWidth?hh*hi.naturalWidth/hi.naturalHeight:hh,hx=W*.5-hw*.62,hy=H*.78-hh;if(hi.naturalWidth)x.drawImage(hi,hx,hy,hw,hh);
@@ -248,4 +259,4 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;T+=dt;x.clear
  for(const id in pickCv){const cv=pickCv[id],g=cv.getContext('2d');g.clearRect(0,0,144,96);drawRig(g,id,72,50,id==='fr'?128:(id==='sis'?80:100),1,T,save.pick===id?'happy':'normal',false,1,id.length);}
  requestAnimationFrame(loop);}
 buildPick();requestAnimationFrame(loop);
-</script></body></html>
+</script><div id="buyAsk" class="hide" role="dialog" aria-modal="true"><div class="bx"><canvas width="168" height="138"></canvas><div class="bq"></div><div class="bc"></div><div class="bb"><button class="by">살래요</button><button class="bn">안 살래요</button></div></div></div></body></html>
