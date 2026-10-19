@@ -1,10 +1,10 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>퐁당 하루</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" sizes="64x64" href="icon-64.png?v=1"><link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=1"><link rel="apple-touch-icon" href="apple-touch-icon.png?v=1">
 <meta name="description" content="SAGATON Studio · 하루 시리즈 첫 번째 — 바닷속 물고기 가족의 하루">
 <style>
 :root{--ink:#3b2a22}
-html,body{margin:0;height:100%;background:#5fb6ea;overflow:hidden;font-family:'Jua',system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;touch-action:none}
+html,body{margin:0;height:100%;background:#5fb6ea;overflow:hidden;font-family:'Poor Story',system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none;touch-action:none}
 canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block}
 .hide{display:none!important}
 .btn{font-family:inherit;font-size:22px;padding:10px 34px;border-radius:999px;border:3px solid var(--ink);background:#ffd34d;color:var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer}
@@ -204,7 +204,7 @@ function drawBush(sx,b,t){const h=Math.min(H*.42,260),y=FLOOR()+30,sh=b.shake>0?
 function bg(off){x.fillStyle='#5fb6ea';x.fillRect(0,0,W,H);layer(BGI.far,off*.08,H,0);const mh=Math.min(H*.25,W*.42);layer(BGI.mid,off*.5,mh,H-mh);}
 function fg(off){const fh=Math.min(H*.2,W*.34);layer(BGI.front,off*1.25+Math.sin(T*.8)*6,fh,H-fh*.85,.95);}
 function tint(f){const S=[[0,[255,170,120,.18]],[.3,[255,255,255,0]],[.62,[255,255,255,0]],[.8,[255,130,70,.22]],[1,[20,30,80,.45]]];let i=0;while(i<S.length-2&&f>S[i+1][0])i++;const A=S[i],B=S[i+1],k=Math.min(1,Math.max(0,(f-A[0])/(B[0]-A[0])));const v=A[1].map((q,j)=>q+(B[1][j]-q)*k);if(v[3]>0){x.fillStyle='rgba('+v[0]+','+v[1]+','+v[2]+','+v[3]+')';x.fillRect(0,0,W,H);}}
-function landmark(img,wx,lbl){if(!img.naturalWidth)return;const hh=Math.min(H*.5,W*.36),hw=hh*img.naturalWidth/img.naturalHeight,sx=wx-cam;if(sx>W+20||sx+hw<-20)return;x.drawImage(img,sx,FLOOR()+H*.17-hh,hw,hh);if(lbl){x.font='18px Jua, system-ui';x.textAlign='center';const tw=x.measureText(lbl).width+20;x.fillStyle='#fff';x.strokeStyle='#3b2a22';x.lineWidth=3;x.beginPath();x.roundRect?x.roundRect(sx+hw/2-tw/2,FLOOR()+H*.17-hh-34,tw,28,14):x.rect(sx+hw/2-tw/2,FLOOR()+H*.17-hh-34,tw,28);x.fill();x.stroke();x.fillStyle='#3b2a22';x.fillText(lbl,sx+hw/2,FLOOR()+H*.17-hh-14);x.textAlign='left';}}
+function landmark(img,wx,lbl){if(!img.naturalWidth)return;const hh=Math.min(H*.5,W*.36),hw=hh*img.naturalWidth/img.naturalHeight,sx=wx-cam;if(sx>W+20||sx+hw<-20)return;x.drawImage(img,sx,FLOOR()+H*.17-hh,hw,hh);if(lbl){x.font='bold 18px "Poor Story", system-ui';x.textAlign='center';const tw=x.measureText(lbl).width+20;x.fillStyle='#fff';x.strokeStyle='#3b2a22';x.lineWidth=3;x.beginPath();x.roundRect?x.roundRect(sx+hw/2-tw/2,FLOOR()+H*.17-hh-34,tw,28,14):x.rect(sx+hw/2-tw/2,FLOOR()+H*.17-hh-34,tw,28);x.fill();x.stroke();x.fillStyle='#3b2a22';x.fillText(lbl,sx+hw/2,FLOOR()+H*.17-hh-14);x.textAlign='left';}}
 // ════════ 플레이 갱신 ════════
 function move(dt,L){let ix=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0),iy=(keys.ArrowDown||keys.s?1:0)-(keys.ArrowUp||keys.w?1:0);if(ix&&iy){ix*=.707;iy*=.707;}if(joy){ix=joy.dx;iy=joy.dy;}
  const sp=P.a.sp*60;P.vx+=(ix*sp-P.vx)*Math.min(1,dt*5);P.vy+=(iy*sp-P.vy)*Math.min(1,dt*5);P.x+=P.vx*dt;P.y+=P.vy*dt;
