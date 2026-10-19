@@ -298,6 +298,7 @@ div.gcard:hover{transform:translateY(-6px);border-color:var(--c);box-shadow:0 30
 .wshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:40px}.wshots figure{margin:0}.wshots img{width:100%;display:block;border-radius:16px;border:1px solid var(--line);image-rendering:pixelated}.wshots figcaption{color:var(--mute);font-size:14px;margin-top:10px}
 .dplay{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
 @media(max-width:760px){.feat{grid-template-columns:1fr}}
+#bgart{transform:none!important;will-change:auto}.nav,.nav.solid{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.nav.solid{background:rgba(7,6,11,.94)!important}section{content-visibility:auto;contain-intrinsic-size:900px}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Poor+Story&display=swap" rel="stylesheet">
 </head>
@@ -361,7 +362,7 @@ div.gcard:hover{transform:translateY(-6px);border-color:var(--c);box-shadow:0 30
  size();for(var i=0;i<70;i++)P.push(spawn(true));window.addEventListener('resize',size);
  var vis=true;if('IntersectionObserver' in window)new IntersectionObserver(function(e){vis=e[0].isIntersecting;}).observe(cv);
  (function loop(){if(vis){ctx.clearRect(0,0,W,H);for(var i=0;i<P.length;i++){var p=P[i];p.w+=.02;p.x+=p.vx+Math.sin(p.w)*.2;p.y+=p.vy;if(p.y<-10)P[i]=spawn(false);
-  ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);ctx.fillStyle='rgba('+p.c+','+p.a+')';ctx.shadowBlur=12;ctx.shadowColor='rgba('+p.c+',.9)';ctx.fill();}}
+  ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);ctx.fillStyle='rgba('+p.c+','+p.a+')';ctx.shadowBlur=0;ctx.shadowColor='rgba('+p.c+',.9)';ctx.fill();}}
   requestAnimationFrame(loop);})();
 })();
 </script>
