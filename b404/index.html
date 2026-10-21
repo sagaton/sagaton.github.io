@@ -507,7 +507,7 @@ let LUMI=null;
 function placeEvents(R,k,S,i){}
 function evRooms(S,i){const ks=Object.keys(S.rooms).filter(k=>['roomA','roomB','water'].includes(S.rooms[k])&&k!==S.mapRoom);const sh=ks.sort(()=>Math.random()-.5);const ev={};
  if(sh[0])ev[sh[0]]='note';const rest=sh.slice(1);
- if(rest.length&&Math.random()<.4)ev[rest.shift()]='merchant';if(rest.length&&Math.random()<.3)ev[rest.shift()]='altar';if(rest.length&&i>0&&Math.random()<.35)ev[rest.shift()]='trap';if(rest.length&&Math.random()<.2)ev[rest.shift()]='gold';
+ if(rest.length&&(i%10===8||Math.random()<.4))ev[rest.shift()]='merchant';if(rest.length&&Math.random()<.3)ev[rest.shift()]='altar';if(rest.length&&i>0&&Math.random()<.35)ev[rest.shift()]='trap';if(rest.length&&Math.random()<.2)ev[rest.shift()]='gold';
  if(!sh[0]){const any=Object.keys(S.rooms).find(k=>S.rooms[k]!=='boss');if(any)ev[any]='note';}return ev;}
 function evSetup(R,kind,i){if(kind==='note')R.items.push({t:'note',x:200+Math.random()*240,y:150+Math.random()*90,n:i+1});
  if(kind==='merchant')R.items.push({t:'merchant',x:470,y:200});
