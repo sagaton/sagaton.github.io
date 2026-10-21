@@ -179,7 +179,7 @@ function solid(px,py){if(!cur)return true;
  if(py<WT)return !(inX&&openDoor('u'));if(py>WB)return !(inX&&openDoor('d'));
  if(px<WL)return !(inY&&openDoor('l'));if(px>WR)return !(inY&&openDoor('r'));return false;}
 function rpos(){for(let n=0;n<40;n++){const x=90+Math.random()*460,y=90+Math.random()*190;if(!solid(x,y)&&!solid(x+6,y+6)&&!solid(x-6,y-6))return [x,y];}return [320,180];}
-function spawn(R,type,n){type=regionOf(stage+1).mix[type]||type;for(let i=0;i<n;i++){const [x,y]=rpos();R.ents.push(mk(type,x,y));}}
+function spawn(R,type,n){const t0=type;type=regionOf(stage+1).mix[type]||type;for(let i=0;i<n;i++){let t=type;if(stage<10&&stage>=2&&Math.random()<.35){t=({skel:'spider',slime:'frog',bat:'bat'})[t0]||t;}const [x,y]=rpos();R.ents.push(mk(t,x,y));}}
 function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;const k4=Math.min(4,Math.floor(i/10)),h2_=Math.floor(k4/2);boss=null;parts=[];stGems=0;stGemTotal=0;const gc=['#5ad0ff','#ff5a8a','#c8a0ff','#7ad06a'];
  if(!P||P.hp<=0)P={pots:2,x:320,y:250,vx:0,vy:0,hp:P&&P.hp>0?P.hp:hs().hp,max:hs().hp,face:1,dir:{x:1,y:0},atk:0,atkCd:0,inv:0,roll:0,rollCd:0,walk:0,lv:1,xp:0,rel:[]};
  const EV=evRooms(S,i);
