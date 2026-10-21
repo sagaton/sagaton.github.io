@@ -657,30 +657,38 @@ div.gcard:hover{transform:translateY(-6px);border-color:var(--c);box-shadow:0 30
   <div class="person rise" style="--c:var(--cq)"><div class="role">STAFF</div><div class="n">양정원</div><div class="e">YANG JUNGWON</div><a class="em" href="mailto:klausenburgh@gmail.com">klausenburgh@gmail.com</a></div>
  </div></div></section>
 <section id="reviews" style="padding-top:0"><div class="wrap">
- <div class="rise"><p class="eyebrow">후기</p><h2 class="lpt">PLAYER<br>NOTES</h2><p class="ctl">해 본 게임의 한마디를 익명으로 남겨 주세요. 이름이나 연락처 같은 개인 정보는 적지 말아 주세요.</p></div>
+ <div class="rise"><p class="eyebrow">후기</p><h2 class="lpt">PLAYER<br>NOTES</h2><p class="ctl">해 본 게임의 한마디를 남겨 주세요. SAGATON 계정(EAST SAGA·퐁당 하루와 같은 계정)으로 로그인하면 쓸 수 있고, ‘익명으로 올리기’를 고르면 다른 사람에게 닉네임이 보이지 않아요.</p></div>
  <div class="rvwrap rise">
   <form class="cform rvform" id="rvForm" novalidate>
+   <div class="sgme" data-who></div>
    <div class="crow"><label>게임<select id="rvGame"><option>퐁당 하루</option><option>EAST SAGA</option><option>B404</option></select></label>
-   <label><span>별명 <small>(선택, 비우면 익명)</small></span><input id="rvNick" maxlength="12" placeholder="익명의 물고기"></label></div>
-   <div class="rvstars" id="rvStars" role="radiogroup" aria-label="별점"><button type="button" data-s="1">★</button><button type="button" data-s="2">★</button><button type="button" data-s="3">★</button><button type="button" data-s="4">★</button><button type="button" data-s="5">★</button></div>
+   <div class="rvstarbox"><span class="lb">별점</span><div class="rvstars" id="rvStars" role="radiogroup" aria-label="별점"><button type="button" data-s="1">★</button><button type="button" data-s="2">★</button><button type="button" data-s="3">★</button><button type="button" data-s="4">★</button><button type="button" data-s="5">★</button></div></div></div>
    <label>한마디<textarea id="rvMsg" rows="3" maxlength="300" placeholder="재밌었던 점, 아쉬운 점 무엇이든 좋아요 (최대 300자)"></textarea></label>
+   <label class="anon"><input type="checkbox" id="rvAnon"> 익명으로 올리기 <small>(체크하지 않으면 닉네임이 보여요)</small></label>
    <p class="cerr" id="rvErr" role="alert"></p>
    <div class="cbtns"><button type="submit" class="cgo" id="rvGo">후기 남기기 →</button></div>
   </form>
   <div class="rvlist" id="rvList"><p class="rvempty">후기를 불러오는 중…</p></div>
  </div></div></section>
 <section id="contact" style="padding-top:0"><div class="wrap">
- <div class="rise"><p class="eyebrow">문의</p><h2 class="lpt">SAY<br>HELLO</h2><p class="ctl">게임 이야기, 버그 제보, 계정 문의, 제휴 제안 무엇이든 보내 주세요. 보통 2~3일 안에 답장드려요.</p></div>
+ <div class="rise"><p class="eyebrow">문의</p><h2 class="lpt">SAY<br>HELLO</h2><p class="ctl">게임 이야기, 버그 제보, 계정 문의, 제휴 제안 무엇이든 보내 주세요. 문의는 SAGATON 팀만 볼 수 있고, 보통 2~3일 안에 답장드려요.</p></div>
  <form class="cform rise" id="cform" novalidate>
+  <div class="sgme" data-who></div>
   <div class="crow"><label>문의 종류<select id="cKind"><option>게임 이야기·의견</option><option>버그 제보</option><option>계정·로그인 문의</option><option>계정 삭제 요청</option><option>제휴·협업 제안</option><option>기타</option></select></label>
   <label>게임<select id="cGame"><option>퐁당 하루</option><option>EAST SAGA</option><option>B404</option><option>회사·기타</option></select></label></div>
-  <div class="crow"><label><span>이름·닉네임 <small>(선택)</small></span><input id="cName" maxlength="30" autocomplete="nickname"></label>
-  <label>답장 받을 이메일<input id="cMail" type="email" maxlength="80" autocomplete="email" inputmode="email" placeholder="you@example.com"></label></div>
+  <label>답장 받을 이메일<input id="cMail" type="email" maxlength="80" autocomplete="email" inputmode="email" placeholder="you@example.com"></label>
   <label>내용<textarea id="cMsg" rows="6" maxlength="3000" placeholder="버그라면 어떤 기기·브라우저에서, 어떤 화면에서 생겼는지 적어 주시면 빨리 고칠 수 있어요."></textarea></label>
+  <label class="anon"><input type="checkbox" id="cAnon"> 익명으로 보내기 <small>(답장에 닉네임을 쓰지 않아요)</small></label>
   <p class="cerr" id="cErr" role="alert"></p>
-  <div class="cbtns"><button type="submit" class="cgo">메일로 보내기 →</button><button type="button" class="ccopy" id="cCopy">이메일 주소 복사</button></div>
-  <p class="cnote">‘메일로 보내기’를 누르면 내용이 채워진 메일 앱이 열려요. 메일 앱이 안 열리면 <b>hkimist20@gmail.com</b>으로 직접 보내 주세요.</p>
- </form></div></section>
+  <div class="cbtns"><button type="submit" class="cgo" id="cGo">문의 보내기 →</button><button type="button" class="ccopy" id="cCopy">이메일 주소 복사</button></div>
+  <p class="cnote">로그인이 어렵다면 <b>hkimist20@gmail.com</b>으로 직접 메일을 보내 주세요.</p>
+ </form>
+ <div class="adm" id="admBox" hidden><h3>관리자 · 받은 문의</h3><div id="admList"></div></div>
+</div></section>
+<div class="sglog" id="sgLog" hidden><div class="sgbox"><button type="button" class="sgx" id="sgX" aria-label="닫기">×</button><h3>SAGATON 로그인</h3><p class="sub">EAST SAGA·퐁당 하루와 같은 계정이에요</p>
+ <button type="button" class="sggo" id="sgG">Google로 계속하기</button><div class="sgor">또는</div>
+ <input id="sgE" type="email" placeholder="이메일" autocomplete="email"><input id="sgP" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password">
+ <p class="cerr" id="sgErr"></p><div class="sgrow"><button type="button" class="cgo" id="sgIn">로그인</button><button type="button" class="ccopy" id="sgUp">가입하기</button></div></div></div>
 <footer><div class="wrap"><span>© 2026 SAGATON Studio</span><span>EAST SAGA는 개발 중인 작품입니다.</span></div></footer>
 
 <script>
@@ -754,35 +762,62 @@ document.querySelectorAll('.nitem').forEach(function(li){li.addEventListener('cl
 addEventListener('keydown',function(e){if(e.key==='Escape')close();});})();
 </script>
 <script>(function(){const el=document.getElementById('b4type');if(!el||matchMedia('(prefers-reduced-motion: reduce)').matches)return;const L=['출구를 찾을 수 없습니다','지하로 내려가기','출구를 찾을 수 없습니다'];let i=0,j=0,del=false;function tick(){const t=L[i];el.textContent=t.slice(0,j);if(!del){j++;if(j>t.length){del=true;setTimeout(tick,1800);return;}}else{j--;if(j<0){del=false;j=0;i=(i+1)%L.length;}}setTimeout(tick,del?45:110);}const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();j=0;tick();}});io.observe(el);})();</script><script>
-(function(){var f=document.getElementById('cform');if(!f)return;var TO='hkimist20@gmail.com',E=function(id){return document.getElementById(id)};
- f.addEventListener('submit',function(e){e.preventDefault();var m=E('cMail').value.trim(),t=E('cMsg').value.trim(),er=E('cErr');
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m)){er.textContent='답장 받을 이메일을 확인해 주세요.';E('cMail').focus();return;}
-  if(t.length<5){er.textContent='내용을 조금만 더 적어 주세요.';E('cMsg').focus();return;}er.textContent='';
-  var sub='[SAGATON 문의] '+E('cKind').value+' · '+E('cGame').value;
-  var body='문의 종류: '+E('cKind').value+'\n게임: '+E('cGame').value+'\n이름·닉네임: '+(E('cName').value.trim()||'-')+'\n답장 받을 이메일: '+m+'\n기기: '+navigator.userAgent+'\n\n'+t;
-  location.href='mailto:'+TO+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(body);});
- E('cCopy').addEventListener('click',function(){var b=this;var done=function(){b.textContent='복사했어요!';setTimeout(function(){b.textContent='이메일 주소 복사';},1600);};
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(TO).then(done,function(){prompt('이메일 주소',TO);});else prompt('이메일 주소',TO);});})();
-</script><script>
 (function(){var CFG={apiKey:"AIzaSyDmYVva4uy-WY0dsHTNqcEtsYMBSAGPdzA",authDomain:"samgyejeon.firebaseapp.com",databaseURL:"https://samgyejeon-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"samgyejeon",storageBucket:"samgyejeon.firebasestorage.app",messagingSenderId:"1048334035623",appId:"1:1048334035623:web:26b743387c81c3f6d40982"};
- var E=function(i){return document.getElementById(i)},list=E('rvList'),form=E('rvForm');if(!list||!form)return;var star=0,db=null,auth=null,ready=null;
+ var ADMIN=['hkimist20@gmail.com','klausenburgh@gmail.com'],TO='hkimist20@gmail.com';
+ var E=function(i){return document.getElementById(i)},auth=null,db=null,ready=null,U=null,UN='',star=0,priv={};
  var BAD=['시발','씨발','ㅅㅂ','병신','ㅂㅅ','개새','좆','지랄','fuck','shit'];
- function esc(t){return String(t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+ function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
  function load(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s);});}
- function init(){if(ready)return ready;var b='https://cdn.jsdelivr.net/npm/firebase@10.12.2/';ready=load(b+'firebase-app-compat.js').then(function(){return load(b+'firebase-auth-compat.js');}).then(function(){return load(b+'firebase-database-compat.js');}).then(function(){var app=firebase.apps.length?firebase.app():firebase.initializeApp(CFG);auth=firebase.auth();db=firebase.database();});return ready;}
+ function init(){if(ready)return ready;var b='https://cdn.jsdelivr.net/npm/firebase@10.12.2/';ready=load(b+'firebase-app-compat.js').then(function(){return load(b+'firebase-auth-compat.js');}).then(function(){return load(b+'firebase-database-compat.js');}).then(function(){if(!firebase.apps.length)firebase.initializeApp(CFG);auth=firebase.auth();db=firebase.database();});return ready;}
+ function isAdmin(){return !!(U&&U.email&&ADMIN.indexOf(U.email.toLowerCase())>=0);}
  function ago(t){var d=(Date.now()-t)/1000;if(d<60)return '방금';if(d<3600)return Math.floor(d/60)+'분 전';if(d<86400)return Math.floor(d/3600)+'시간 전';if(d<86400*30)return Math.floor(d/86400)+'일 전';var x=new Date(t);return x.getFullYear()+'.'+(x.getMonth()+1)+'.'+x.getDate();}
- function render(arr){if(!arr.length){list.innerHTML='<p class="rvempty">아직 후기가 없어요. 첫 후기를 남겨 주세요!</p>';return;}
-  list.innerHTML=arr.map(function(r){return '<div class="rv"><div class="rh"><span><span class="rg">'+esc(r.g||'')+'</span> · '+esc(r.n||'익명의 물고기')+'</span><span><span class="rs">'+'★★★★★'.slice(0,r.s||0)+'</span> · '+ago(r.t||Date.now())+'</span></div><p>'+esc(r.m||'')+'</p></div>';}).join('');}
- init().then(function(){db.ref('reviews').orderByChild('t').limitToLast(40).on('value',function(sn){var a=[];sn.forEach(function(c){a.push(c.val());});a.reverse();render(a);},function(){list.innerHTML='<p class="rvempty">후기 게시판을 준비하고 있어요. 조금만 기다려 주세요!</p>';});}).catch(function(){list.innerHTML='<p class="rvempty">후기를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</p>';});
+ function errMsg(x){var c=(x&&x.code)||String(x);if(/unauthorized-domain/.test(c))return '이 주소는 아직 로그인 준비 중이에요. 잠시 뒤 다시 해 주세요.';if(/popup-closed|cancelled-popup/.test(c))return '로그인 창이 닫혔어요.';if(/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c))return '이메일이나 비밀번호가 틀렸어요.';if(/email-already/.test(c))return '이미 가입된 이메일이에요. 로그인해 주세요.';if(/weak-password/.test(c))return '비밀번호는 6자 이상이어야 해요.';if(/invalid-email/.test(c))return '이메일 형식이 맞지 않아요.';if(/PERMISSION|permission/.test(c))return '게시판을 준비하고 있어요. 조금만 기다려 주세요!';if(/network/.test(c))return '인터넷 연결을 확인해 주세요.';return '문제가 생겼어요. 잠시 뒤 다시 해 주세요.';}
+ // ── 로그인 상태 표시 ──
+ function paintWho(){document.querySelectorAll('[data-who]').forEach(function(el){if(U){el.innerHTML='<span><b>'+esc(UN||'이름 없는 여행자')+'</b> 님으로 로그인됨'+(isAdmin()?' · <em>관리자</em>':'')+'</span><button type="button" class="lnk" data-out>로그아웃</button>';}else{el.innerHTML='<span>로그인하면 남길 수 있어요</span><button type="button" class="lnk on" data-login>로그인 · 가입</button>';}});
+  document.querySelectorAll('[data-login]').forEach(function(b){b.onclick=openLog;});document.querySelectorAll('[data-out]').forEach(function(b){b.onclick=function(){auth.signOut();};});
+  if(U&&E('cMail')&&!E('cMail').value)E('cMail').value=U.email||'';E('admBox').hidden=!isAdmin();if(isAdmin())loadAdm();}
+ function openLog(){E('sgLog').hidden=false;E('sgErr').textContent='';}
+ E('sgX').onclick=function(){E('sgLog').hidden=true;};E('sgLog').addEventListener('click',function(e){if(e.target===this)this.hidden=true;});
+ E('sgG').onclick=function(){init().then(function(){return auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}).then(function(){E('sgLog').hidden=true;}).catch(function(x){E('sgErr').textContent=errMsg(x);});};
+ E('sgIn').onclick=function(){var e=E('sgE').value.trim(),p=E('sgP').value;init().then(function(){return auth.signInWithEmailAndPassword(e,p);}).then(function(){E('sgLog').hidden=true;}).catch(function(x){E('sgErr').textContent=errMsg(x);});};
+ E('sgUp').onclick=function(){var e=E('sgE').value.trim(),p=E('sgP').value;init().then(function(){return auth.createUserWithEmailAndPassword(e,p);}).then(function(){E('sgLog').hidden=true;}).catch(function(x){E('sgErr').textContent=errMsg(x);});};
+ // ── 후기 목록 ──
+ function render(arr){var L=E('rvList');if(!arr.length){L.innerHTML='<p class="rvempty">아직 후기가 없어요. 첫 후기를 남겨 주세요!</p>';return;}
+  L.innerHTML=arr.map(function(r){var p=priv[r.k];return '<div class="rv"><div class="rh"><span><span class="rg">'+esc(r.g)+'</span> · '+esc(r.n||'익명')+'</span><span><span class="rs">'+'★★★★★'.slice(0,r.s||0)+'</span> · '+ago(r.t||Date.now())+'</span></div><p>'+esc(r.m)+'</p>'+(isAdmin()?'<div class="radm">'+(p?'계정: <b>'+esc(p.name||'-')+'</b> · '+esc(p.email||'-'):'계정 정보 없음')+' <button type="button" class="lnk" data-del="'+esc(r.k)+'">지우기</button></div>':'')+'</div>';}).join('');
+  L.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){if(!confirm('이 후기를 지울까요?'))return;var k=b.dataset.del;db.ref('reviews/'+k).remove().then(function(){return db.ref('reviews_private/'+k).remove();}).catch(function(x){alert(errMsg(x));});};});}
+ var last=[];
+ init().then(function(){
+  auth.onAuthStateChanged(function(u){U=u;UN='';if(!u){priv={};paintWho();render(last);return;}
+   db.ref('users/'+u.uid+'/name').once('value').then(function(s){UN=s.val()||(u.displayName||'').slice(0,12)||(u.email||'').split('@')[0];}).catch(function(){UN=(u.email||'').split('@')[0];}).then(function(){paintWho();
+    if(isAdmin())db.ref('reviews_private').limitToLast(80).on('value',function(sn){priv=sn.val()||{};render(last);});else render(last);});});
+  db.ref('reviews').orderByChild('t').limitToLast(40).on('value',function(sn){var a=[];sn.forEach(function(c){var v=c.val();v.k=c.key;a.push(v);});a.reverse();last=a;render(a);},function(){E('rvList').innerHTML='<p class="rvempty">후기 게시판을 준비하고 있어요. 조금만 기다려 주세요!</p>';});
+ }).catch(function(){E('rvList').innerHTML='<p class="rvempty">후기를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</p>';paintWho();});
+ paintWho();
+ // ── 후기 쓰기 ──
  E('rvStars').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;star=+b.dataset.s;this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',+x.dataset.s<=star);});});
- form.addEventListener('submit',function(e){e.preventDefault();var er=E('rvErr'),m=E('rvMsg').value.trim(),n=E('rvNick').value.trim().slice(0,12),go=E('rvGo');
-  if(!star){er.textContent='별점을 눌러 주세요.';return;}if(m.length<2){er.textContent='한마디를 조금만 더 적어 주세요.';return;}
-  var low=(m+n).toLowerCase().replace(/\s/g,'');if(BAD.some(function(w){return low.indexOf(w)>=0;})){er.textContent='고운 말로 다시 적어 주세요.';return;}
+ function guard(t,er){var low=t.toLowerCase().replace(/\s/g,'');if(BAD.some(function(w){return low.indexOf(w)>=0;})){er.textContent='고운 말로 다시 적어 주세요.';return false;}return true;}
+ E('rvForm').addEventListener('submit',function(e){e.preventDefault();var er=E('rvErr'),m=E('rvMsg').value.trim(),go=E('rvGo');
+  if(!U){openLog();er.textContent='로그인하고 남겨 주세요.';return;}if(!star){er.textContent='별점을 눌러 주세요.';return;}if(m.length<2){er.textContent='한마디를 조금만 더 적어 주세요.';return;}if(!guard(m,er))return;
   if(/(\d{2,3}[-\s.]?\d{3,4}[-\s.]?\d{4})|(@[a-z0-9-]+\.)/i.test(m)){er.textContent='전화번호나 이메일 같은 개인 정보는 빼고 적어 주세요.';return;}
-  var last=0;try{last=+localStorage.getItem('sg_rv_t')||0;}catch(_){}if(Date.now()-last<60000){er.textContent='후기는 1분에 한 번만 남길 수 있어요.';return;}
-  er.textContent='';go.disabled=true;go.textContent='올리는 중…';
-  init().then(function(){return auth.currentUser?auth.currentUser:auth.signInAnonymously().then(function(c){return c.user;});}).then(function(u){return db.ref('reviews').push({g:E('rvGame').value,n:n||'익명의 물고기',s:star,m:m,t:firebase.database.ServerValue.TIMESTAMP,u:u.uid});})
-  .then(function(){try{localStorage.setItem('sg_rv_t',Date.now());}catch(_){}E('rvMsg').value='';E('rvNick').value='';star=0;E('rvStars').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});go.textContent='고마워요!';setTimeout(function(){go.disabled=false;go.textContent='후기 남기기 →';},1500);})
-  .catch(function(x){var c=(x&&x.code)||'';er.textContent=(c.indexOf('operation-not-allowed')>=0||c.indexOf('admin-restricted')>=0||c.indexOf('PERMISSION')>=0||String(x).indexOf('permission')>=0)?'후기 게시판을 준비하고 있어요. 조금만 기다려 주세요!':'올리지 못했어요. 잠시 뒤 다시 해 주세요.';go.disabled=false;go.textContent='후기 남기기 →';});});})();
-</script></body>
+  var lt=0;try{lt=+localStorage.getItem('sg_rv_t')||0;}catch(_){}if(Date.now()-lt<60000){er.textContent='후기는 1분에 한 번만 남길 수 있어요.';return;}
+  er.textContent='';go.disabled=true;go.textContent='올리는 중…';var anon=E('rvAnon').checked,ref=db.ref('reviews').push(),TS=firebase.database.ServerValue.TIMESTAMP;
+  ref.set({g:E('rvGame').value,n:anon?'익명':(UN||'이름 없는 여행자').slice(0,12),a:anon,s:star,m:m,t:TS}).then(function(){return db.ref('reviews_private/'+ref.key).set({uid:U.uid,email:U.email||'',name:(UN||'').slice(0,12),t:TS});})
+  .then(function(){try{localStorage.setItem('sg_rv_t',Date.now());}catch(_){}E('rvMsg').value='';star=0;E('rvStars').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});go.textContent='고마워요!';setTimeout(function(){go.disabled=false;go.textContent='후기 남기기 →';},1500);})
+  .catch(function(x){er.textContent=errMsg(x);go.disabled=false;go.textContent='후기 남기기 →';});});
+ // ── 문의 보내기 ──
+ E('cform').addEventListener('submit',function(e){e.preventDefault();var er=E('cErr'),m=E('cMsg').value.trim(),mail=E('cMail').value.trim(),go=E('cGo');
+  if(!U){openLog();er.textContent='로그인하고 보내 주세요.';return;}if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)){er.textContent='답장 받을 이메일을 확인해 주세요.';return;}if(m.length<5){er.textContent='내용을 조금만 더 적어 주세요.';return;}
+  er.textContent='';go.disabled=true;go.textContent='보내는 중…';
+  db.ref('inquiries').push({kind:E('cKind').value,game:E('cGame').value,m:m,mail:mail,anon:E('cAnon').checked,uid:U.uid,email:U.email||'',name:(UN||'').slice(0,12),ua:navigator.userAgent.slice(0,200),t:firebase.database.ServerValue.TIMESTAMP})
+  .then(function(){E('cMsg').value='';go.textContent='보냈어요! 고마워요';setTimeout(function(){go.disabled=false;go.textContent='문의 보내기 →';},2000);})
+  .catch(function(x){er.textContent=errMsg(x)+' 급하면 메일로 보내 주세요.';go.disabled=false;go.textContent='문의 보내기 →';});});
+ E('cCopy').addEventListener('click',function(){var b=this;var done=function(){b.textContent='복사했어요!';setTimeout(function(){b.textContent='이메일 주소 복사';},1600);};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(TO).then(done,function(){prompt('이메일 주소',TO);});else prompt('이메일 주소',TO);});
+ // ── 관리자: 받은 문의 ──
+ var admOn=false;function loadAdm(){if(admOn)return;admOn=true;db.ref('inquiries').orderByChild('t').limitToLast(60).on('value',function(sn){var a=[];sn.forEach(function(c){var v=c.val();v.k=c.key;a.push(v);});a.reverse();
+  E('admList').innerHTML=a.length?a.map(function(q){return '<div class="rv"><div class="rh"><span><span class="rg">'+esc(q.kind)+'</span> · '+esc(q.game)+'</span><span>'+ago(q.t||Date.now())+'</span></div><p>'+esc(q.m)+'</p><div class="radm">계정: <b>'+esc(q.name||'-')+'</b> · '+esc(q.email||'-')+(q.anon?' · 익명 요청':'')+'<br>답장: <a href="mailto:'+esc(q.mail)+'?subject='+encodeURIComponent('[SAGATON] 문의 답변')+'">'+esc(q.mail)+'</a> <button type="button" class="lnk" data-qdel="'+esc(q.k)+'">지우기</button></div></div>';}).join(''):'<p class="rvempty">받은 문의가 없어요.</p>';
+  E('admList').querySelectorAll('[data-qdel]').forEach(function(b){b.onclick=function(){if(confirm('이 문의를 지울까요?'))db.ref('inquiries/'+b.dataset.qdel).remove();};});},function(){E('admList').innerHTML='<p class="rvempty">문의를 볼 권한이 아직 없어요. 규칙 설정을 확인해 주세요.</p>';});}
+})();
+</script>
+<style>.sgme{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--mute);padding:10px 14px;border:1px dashed var(--line);border-radius:12px}.sgme b{color:var(--fg)}.sgme em{color:var(--gold);font-style:normal}.lnk{font:inherit;font-size:14px;background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;padding:0}.lnk.on{color:var(--gold)}.anon{display:flex!important;flex-direction:row;align-items:center;gap:8px;color:var(--fg)!important;font-size:15px!important;cursor:pointer}.anon input{width:18px;height:18px;accent-color:var(--gold)}.anon small{color:var(--mute)}.rvstarbox{display:grid;gap:7px;font-size:14px;color:var(--mute)}.radm{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:13px;color:var(--gold)}.radm b{color:var(--fg)}.radm a{color:#8ad8ff}.adm{margin-top:28px;max-width:760px}.adm h3{margin:0 0 12px;color:var(--gold)}.adm #admList{display:grid;gap:12px}.sglog{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}.sglog[hidden]{display:none}.sgbox{position:relative;width:min(380px,100%);background:#121019;border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;gap:10px;text-align:center}.sgbox h3{margin:0}.sgbox .sub{margin:-4px 0 6px;color:var(--mute);font-size:13px}.sgbox input{font:inherit;font-size:16px;color:var(--fg);background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px 14px}.sggo{font:inherit;font-size:16px;background:#fff;color:#222;border:0;border-radius:999px;padding:12px;cursor:pointer;font-weight:600}.sgor{color:var(--mute);font-size:13px}.sgrow{display:flex;gap:8px;justify-content:center}.sgx{position:absolute;right:12px;top:8px;background:none;border:0;color:var(--mute);font-size:26px;cursor:pointer}</style>
+</body>
 </html>
