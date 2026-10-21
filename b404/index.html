@@ -253,7 +253,9 @@ if(e.type==='slime'){parts.push({x:e.x+e.face*6,y:e.y-5,vx:ux*75,vy:uy*75,l:2.4,
  else{fx('slash',e.x+e.face*12,e.y-8,.22,{fl:e.face<0});if(d<28&&P.roll<=0)hurtPlayer(1,e.x,e.y);snd(160,.1,'square',.05,-80);}}
 function say(t,d=1.8){msg=t;msgT=d;}
 // ════ 입력 ════
-const keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if(MODE==='play'){if(e.key===' '||e.key.toLowerCase()==='j')attack();if(e.key==='Shift'||e.key.toLowerCase()==='k')roll();if(e.key.toLowerCase()==='h'||e.key.toLowerCase()==='l')drink();}});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
+const keys={};const kName=e=>{const c=e.code||'';if(/^Key[A-Z]$/.test(c))return c.slice(3).toLowerCase();if(c==='Space')return ' ';if(c.startsWith('Arrow'))return c.toLowerCase();if(c.startsWith('Shift'))return 'shift';return (e.key||'').toLowerCase();};
+addEventListener('keydown',e=>{const k=kName(e);keys[k]=1;if(MODE==='play'){if(k===' '||k.startsWith('arrow'))e.preventDefault();if(document.activeElement&&document.activeElement.tagName==='BUTTON')document.activeElement.blur();if(e.repeat&&k!==' '&&k!=='j')return;if(k===' '||k==='j')attack();if(k==='shift'||k==='k')roll();if(k==='h'||k==='l')drink();}});addEventListener('keyup',e=>{keys[kName(e)]=0;});addEventListener('blur',()=>{for(const k in keys)keys[k]=0;});
+addEventListener('mousedown',e=>{if(MODE==='play'&&e.button===0&&e.target&&e.target.id==='c'&&!matchMedia('(pointer:coarse)').matches)attack();});
 let joy=null;const jEl=$('joy'),jK=jEl.querySelector('i');
 addEventListener('pointerdown',e=>{if(MODE!=='play'||e.target.tagName==='BUTTON')return;if(e.clientX>innerWidth*.55)return;joy={id:e.pointerId,ox:e.clientX,oy:e.clientY,dx:0,dy:0};jEl.style.display='block';jEl.style.left=e.clientX+'px';jEl.style.top=e.clientY+'px';jK.style.transform='';});
 addEventListener('pointermove',e=>{if(!joy||e.pointerId!==joy.id)return;let dx=e.clientX-joy.ox,dy=e.clientY-joy.oy;const d=Math.hypot(dx,dy),R=50;if(d>R){dx*=R/d;dy*=R/d;}joy.dx=dx/R;joy.dy=dy/R;jK.style.transform='translate('+dx+'px,'+dy+'px)';});
@@ -619,7 +621,7 @@ if(it.t==='note')lockHint(it,d,20);if(it.t==='note'&&d<20&&!locked()){it.got=1;s
 // ════ 루프 ════
 let last=performance.now();
 function loop(now){const dt=Math.min(.04,(now-last)/1000);last=now;T+=dt;if(MODE==='play')update(dt);if(map)draw();updHud();requestAnimationFrame(loop);}
-function showBtns(on){const touch=matchMedia('(pointer:coarse)').matches;$('atk').classList.toggle('hide',!on||!touch);$('dash').classList.toggle('hide',!on||!touch);$('heal').classList.toggle('hide',!on||!touch);updHeal();}
+function showBtns(on){const touch=true;$('atk').classList.toggle('hide',!on||!touch);$('dash').classList.toggle('hide',!on||!touch);$('heal').classList.toggle('hide',!on||!touch);updHeal();}
 function bankTake(){let b=0;try{b=+localStorage.getItem('b404_bank')||0;localStorage.removeItem('b404_bank');}catch(e){}return b;}
 function start(){gold=bankTake();if(gold)setTimeout(()=>say('선물로 받은 골드 +'+gold,2.4),3000);gems=0;kills=0;deaths=0;FLOORS={};$('title').classList.add('hide');drone();storyPlay(STORY0,()=>{P=null;load(0);MODE='play';t0=performance.now();showBtns(true);saveCk();});}
 function cont(){const c=loadCk();if(!c)return start();gold=c.gold||0;gems=c.gems||0;kills=c.kills||0;deaths=c.deaths||0;if(c.hero&&HEROES[c.hero]){HSEL=c.hero;HERO=HEROES[HSEL];}P=null;FLOORS={};$('title').classList.add('hide');drone();load(c.stage);P.max=c.max||6;P.atkB=c.atkB||0;P.lv=c.lv||1;P.xp=c.xp||0;P.rel=(c.rel||[]).slice();if(hasR('eye'))hasMap=true;P.hp=Math.max(2,Math.min(P.max,c.hp||6));P.pots=c.pots||0;MODE='play';t0=performance.now();showBtns(true);say('이어하기 — '+getFloor(c.stage).name,2.4);}
