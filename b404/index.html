@@ -113,7 +113,7 @@ function solid(px,py){if(!cur)return true;
 function rpos(){for(let n=0;n<40;n++){const x=90+Math.random()*460,y=90+Math.random()*190;if(!solid(x,y)&&!solid(x+6,y+6)&&!solid(x-6,y-6))return [x,y];}return [320,180];}
 function spawn(R,type,n){for(let i=0;i<n;i++){const [x,y]=rpos();R.ents.push(mk(type,x,y));}}
 function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;const k4=Math.min(5,Math.floor(i/4)),h2_=Math.floor(k4/2);boss=null;parts=[];stGems=0;stGemTotal=0;const gc=['#5ad0ff','#ff5a8a','#c8a0ff','#7ad06a'];
- if(!P||P.hp<=0)P={pots:1,x:320,y:250,vx:0,vy:0,hp:P&&P.hp>0?P.hp:6,max:6,face:1,dir:{x:1,y:0},atk:0,atkCd:0,inv:0,roll:0,rollCd:0,walk:0};
+ if(!P||P.hp<=0)P={pots:2,x:320,y:250,vx:0,vy:0,hp:P&&P.hp>0?P.hp:6,max:6,face:1,dir:{x:1,y:0},atk:0,atkCd:0,inv:0,roll:0,rollCd:0,walk:0};
  for(const k in S.rooms){const type=S.rooms[k],R={type,ents:[],items:[],seen:false,doors:{}};RS[k]=R;cur=R;
   for(const d in DIRS){const nk=nbKey(k,d),nt=S.rooms[nk];R.doors[d]=!!nt&&allow(type,d)&&allow(nt,DIRS[d][2]);}
   const gem=(x,y)=>{R.items.push({t:'chest',x,y,has:'gem',gem:gc[stGemTotal%4]});stGemTotal++;};
@@ -125,7 +125,7 @@ function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;con
   if(k===S.mapRoom)R.items.push({t:'chest',x:440,y:120,has:'map'});
   if(type==='boss')R.boss=true;}
  if(S.rooms[Object.keys(S.rooms).find(k=>S.rooms[k]==='boss')])stGemTotal++;
- enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':S.name,2.6);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);}
+ curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':S.name,2.6);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);}
 function enter(k,from){if(cur&&RS[curKey]===cur){cur.ents=ents;cur.items=items;}curKey=k;cur=RS[k];cur.seen=true;ents=cur.ents;items=cur.items;parts=[];fade=.25;
  if(from==='u'){P.x=320;P.y=WB-10;}else if(from==='d'){P.x=320;P.y=WT+12;}else if(from==='l'){P.x=WR-10;P.y=170;}else if(from==='r'){P.x=WL+10;P.y=170;}else{P.x=320;P.y=250;}
  P.vx=P.vy=0;torches=TORCH.map(([x,y])=>({x,y}));
@@ -143,7 +143,7 @@ function drawRoom(ox,oy){const im=RIMG[cur.type];if(im.complete)g.drawImage(im,-
   if(cur.doors.u)for(let x=DX0+2;x<DX1;x+=7)bar(x,22,3,WT-20);if(cur.doors.d)for(let x=DX0+2;x<DX1;x+=7)bar(x,WB,3,RH-WB-20);
   if(cur.doors.l)for(let y=DY0+2;y<DY1;y+=7)bar(4,y,WL-4,3);if(cur.doors.r)for(let y=DY0+2;y<DY1;y+=7)bar(WR,y,RW-WR-4,3);}}
 function drawMini(){const S=getFloor(stage),ks=Object.keys(S.rooms),xs=ks.map(k=>+k.split(',')[0]),ys=ks.map(k=>+k.split(',')[1]),mx=Math.min(...xs),My=Math.max(...ys);for(const k in S.rooms){const R=RS[k];if(!R||(!R.seen&&!hasMap))continue;const [x,y]=k.split(',').map(Number),px=4+(x-mx)*8,py=VH-10-(My-y)*6;g.fillStyle=k===curKey?'#e8d8c0':R.seen?'rgba(150,140,130,.6)':'rgba(110,100,95,.35)';g.fillRect(px,py,7,5);if(R.type==='stairs'){g.fillStyle='#000';g.fillRect(px+3,py+1,1,3);}if(R.type==='treasure'&&!hasKey){g.fillStyle='#f0c040';g.fillRect(px+3,py+2,1,1);}if(R.type==='boss'){g.fillStyle='#a01820';g.fillRect(px+2,py+1,3,3);}if(hasMap&&k===S.mapRoom&&false){}}if(hasMap){g.font='8px G7';g.fillStyle='#e8d8a0';g.fillText('지도',4,VH-12-(My-Math.min(...ys)+1)*6);}}
-function mk(type,x,y){const base={slime:{hp:3,sp:18,r:4,dmg:1,sense:70},skel:{hp:5,sp:26,r:4,dmg:1,sense:90},bat:{hp:2,sp:46,r:3,dmg:1,sense:110}}[type];const o=Object.assign({type,x,y,vx:0,vy:0,hurt:0,cd:0,ph:Math.random()*6,face:1,awake:false},base);o.hp+=Math.min(10,Math.floor(stage/5));o.sp*=1+Math.min(stage,120)/240;o.sense+=Math.min(stage,60);if(stage>=(type==='skel'?20:35))o.dmg=2;o.max=o.hp;return o;}
+function mk(type,x,y){const base={slime:{hp:2,sp:18,r:4,dmg:1,sense:70},skel:{hp:3,sp:26,r:4,dmg:1,sense:90},bat:{hp:2,sp:42,r:3,dmg:1,sense:110}}[type];const o=Object.assign({type,x,y,vx:0,vy:0,hurt:0,cd:0,ph:Math.random()*6,face:1,awake:false},base);o.hp+=Math.min(8,Math.floor(stage/7));o.sp*=1+Math.min(stage,120)/240;o.sense+=Math.min(stage,60);if(stage>=(type==='skel'?20:35))o.dmg=2;o.max=o.hp;return o;}
 const ATK={slime:{r:95,cd:2.6,f:180},skel:{r:26,cd:1.3,f:240},bat:{r:115,cd:3.2,f:900}};
 function fireE(e,ux,uy,d){if(e.type==='slime'){parts.push({x:e.x+e.face*6,y:e.y-5,vx:ux*75,vy:uy*75,l:2.4,col:'#a8e050',orb:1});snd(300,.1,'sine',.04,-150);}
  else if(e.type==='bat'){for(let k=0;k<3;k++)setTimeout(()=>{if(!e.dead)parts.push({x:e.x+e.face*6,y:e.y-6,vx:ux*120,vy:uy*120,l:1.8,col:'#ff4a4a',orb:1});},k*90);snd(1100,.15,'sawtooth',.025,-500);}
@@ -170,7 +170,7 @@ function drink(){if(MODE!=='play'||!P)return;if(!(P.pots>0)){say('물약이 없�
 function updHeal(){const b=$('heal');if(b)b.querySelector('b').textContent=(P&&P.pots)||0;}
 function roll(){if(P.rollCd>0)return;P.roll=.25;P.rollCd=.7;P.inv=Math.max(P.inv,.3);snd(500,.08,'triangle',.03,-300);}
 function hit(e,d,dir){if(e.hurt>0)return;e.hp-=d;e.hurt=.2;e.vx=dir.x*90;e.vy=dir.y*90;e.awake=true;shake=.08;snd(140,.08,'square',.05,-60);blood(e.x,e.y,e.type==='slime'?'#3a8a4a':e.type==='skel'?'#e8e0d0':'#6a3a8a',5);
- if(e.hp<=0){e.dead=true;blood(e.x,e.y,e.type==='slime'?'#7ad06a':'#9a90a0',10);snd(70,.2,'sawtooth',.06,-40);kills++;for(let i=0;i<(e.type==='skel'?4:2);i++)items.push({t:'coin',x:e.x+(Math.random()-.5)*10,y:e.y+(Math.random()-.5)*10,vx:(Math.random()-.5)*60,vy:-30-Math.random()*30,z:0,born:T});if(Math.random()<.22)items.push({t:'potion',x:e.x,y:e.y});}}
+ if(e.hp<=0){e.dead=true;blood(e.x,e.y,e.type==='slime'?'#7ad06a':'#9a90a0',10);snd(70,.2,'sawtooth',.06,-40);kills++;for(let i=0;i<(e.type==='skel'?4:2);i++)items.push({t:'coin',x:e.x+(Math.random()-.5)*10,y:e.y+(Math.random()-.5)*10,vx:(Math.random()-.5)*60,vy:-30-Math.random()*30,z:0,born:T});if(Math.random()<.3)items.push({t:'potion',x:e.x,y:e.y});}}
 function blood(x,y,col,n){for(let i=0;i<n;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90-20,l:.4+Math.random()*.5,col});}
 function hurtPlayer(d,fx,fy){if(P.inv>0)return;P.hp-=d;P.inv=1;shake=.25;const a=Math.atan2(P.y-fy,P.x-fx);P.vx=Math.cos(a)*160;P.vy=Math.sin(a)*160;snd(60,.25,'sawtooth',.08,-30);blood(P.x,P.y,'#e83a3a',8);
  if(P.hp<=0){MODE='over';deaths++;$('ovT').textContent='사망';$('ovP').innerHTML=getFloor(stage).name+'에서 쓰러졌습니다.<br>처치 '+kills+' · 골드 '+gold+' · 보물 '+gems;$('over').classList.remove('hide');showBtns(false);}}
