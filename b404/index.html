@@ -143,6 +143,7 @@ function rpos(){for(let n=0;n<40;n++){const x=90+Math.random()*460,y=90+Math.ran
 function spawn(R,type,n){type=regionOf(stage+1).mix[type]||type;for(let i=0;i<n;i++){const [x,y]=rpos();R.ents.push(mk(type,x,y));}}
 function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;const k4=Math.min(5,Math.floor(i/4)),h2_=Math.floor(k4/2);boss=null;parts=[];stGems=0;stGemTotal=0;const gc=['#5ad0ff','#ff5a8a','#c8a0ff','#7ad06a'];
  if(!P||P.hp<=0)P={pots:2,x:320,y:250,vx:0,vy:0,hp:P&&P.hp>0?P.hp:hs().hp,max:hs().hp,face:1,dir:{x:1,y:0},atk:0,atkCd:0,inv:0,roll:0,rollCd:0,walk:0};
+ const EV=evRooms(S,i);
  for(const k in S.rooms){const type=S.rooms[k],R={type,ents:[],items:[],seen:false,doors:{}};RS[k]=R;cur=R;
   for(const d in DIRS){const nk=nbKey(k,d),nt=S.rooms[nk];R.doors[d]=!!nt&&allow(type,d)&&allow(nt,DIRS[d][2]);}
   const gem=(x,y)=>{R.items.push({t:'chest',x,y,has:'gem',gem:gc[stGemTotal%4]});stGemTotal++;};
@@ -151,7 +152,7 @@ function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;con
   if(type==='water'){spawn(R,'slime',1+h2_);spawn(R,'bat',1+h2_);gem(560,100);}
   if(type==='treasure'){R.items.push({t:'chest',x:98,y:74,has:'key',big:1});spawn(R,'skel',1+h2_);}
   if(type==='stairs'){spawn(R,'skel',1+h2_);spawn(R,'slime',i>0?1:0);gem(540,284);}
-  if(k===S.mapRoom)R.items.push({t:'chest',x:440,y:120,has:'map'});
+  if(k===S.mapRoom)R.items.push({t:'chest',x:440,y:120,has:'map'});if(EV[k])evSetup(R,EV[k],i);
   if(type==='boss')R.boss=true;}
  if(S.rooms[Object.keys(S.rooms).find(k=>S.rooms[k]==='boss')])stGemTotal++;
  curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':(i%10===0?'새로운 지역 — '+regionOf(i+1).n:S.name),2.8);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);}
@@ -199,7 +200,7 @@ let droneOn=false;function drone(){if(droneOn)return;try{AC=AC||new (window.Audi
 // ════ 행동 ════
 function attack(){if(P.atkCd>0||P.roll>0)return;P.atk=.18;P.atkCd=.32;snd(220,.07,'square',.04,-120);
  const ax=P.x+P.dir.x*12,ay=P.y-6+P.dir.y*12;
- const cr=Math.random()<hs().crit,dmg=hs().atk*(cr?2:1);if(cr)parts.push({x:P.x,y:P.y-14,vx:0,vy:-20,l:.4,col:'#fff'});for(const e of ents){if(Math.hypot(e.x-ax,e.y-ay)<e.r+13)hit(e,dmg,P.dir);}
+ const cr=Math.random()<hs().crit,dmg=(hs().atk+(P.atkB||0))*(cr?2:1);if(cr)parts.push({x:P.x,y:P.y-14,vx:0,vy:-20,l:.4,col:'#fff'});for(const e of ents){if(Math.hypot(e.x-ax,e.y-ay)<e.r+13)hit(e,dmg,P.dir);}
  if(boss&&Math.hypot(boss.x-ax,boss.y-ay)<36){boss.hp-=dmg;boss.hurt=.15;shake=.15;snd(90,.12,'sawtooth',.06);blood(boss.x,boss.y,'#a01820',6);if(boss.hp<=0)win();}}
 function dmgTxt(x,y,t,c){(window.DTX=window.DTX||[]).push({x,y,t,c,l:.9});}
 function healFx(){(window.DTX=window.DTX||[]).push({x:P.x,y:P.y-30,t:'회복',c:'#7ae07a',l:.9});for(let k=0;k<14;k++)parts.push({x:P.x+(Math.random()-.5)*10,y:P.y-4,vx:(Math.random()-.5)*30,vy:-30-Math.random()*40,l:.7,col:k%2?'#7ad06a':'#e8ffd0'});}
@@ -221,7 +222,7 @@ function update(dt){
  let ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);if(joy){ix=joy.dx;iy=joy.dy;}
  const m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m;}if(m>.2){P.dir={x:ix/Math.max(m,1e-3)*(m>1?1:1),y:iy/Math.max(m,1e-3)};const dl=Math.hypot(P.dir.x,P.dir.y);P.dir.x/=dl;P.dir.y/=dl;if(Math.abs(ix)>.2)P.face=ix>0?1:-1;P.vd=Math.abs(iy)>Math.abs(ix)*1.15?(iy<0?'up':'down'):'side';P.walk+=dt*11;}
  const sp=P.roll>0?150:62*hs().sp;const tx=P.roll>0?P.dir.x*sp:ix*sp,ty=P.roll>0?P.dir.y*sp:iy*sp;P.vx+=(tx-P.vx)*Math.min(1,dt*12);P.vy+=(ty-P.vy)*Math.min(1,dt*12);
- moveBody(P,dt,4);if(checkExit())return;if(P.roll>0&&hs().rollHit){for(const e of ents)if(!e.dead&&Math.hypot(e.x-P.x,e.y-P.y)<e.r+9)hit(e,1,P.dir);}P.atk=Math.max(0,P.atk-dt);P.atkCd=Math.max(0,P.atkCd-dt);P.inv=Math.max(0,P.inv-dt);P.roll=Math.max(0,P.roll-dt);P.rollCd=Math.max(0,P.rollCd-dt);
+ moveBody(P,dt,4);if(checkExit())return;trapStep();if(P.roll>0&&hs().rollHit){for(const e of ents)if(!e.dead&&Math.hypot(e.x-P.x,e.y-P.y)<e.r+9)hit(e,1,P.dir);}P.atk=Math.max(0,P.atk-dt);P.atkCd=Math.max(0,P.atkCd-dt);P.inv=Math.max(0,P.inv-dt);P.roll=Math.max(0,P.roll-dt);P.rollCd=Math.max(0,P.rollCd-dt);
  // 적
  for(const e of ents){if(e.dead)continue;e.ph+=dt*6;e.hurt=Math.max(0,e.hurt-dt);e.cd=Math.max(0,e.cd-dt);const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy);
   if(!e.awake&&d<e.sense&&los(e.x,e.y,P.x,P.y)){e.awake=true;if(e.type==='skel')snd(110,.15,'square',.03,40);}
@@ -242,7 +243,7 @@ function update(dt){
  for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.l-=dt;if(!p.orb){p.vx*=.9;p.vy=p.vy*.9+40*dt;}else{if(solid(p.x,p.y))p.l=0;if(Math.hypot(p.x-P.x,p.y-P.y)<4&&P.roll<=0){hurtPlayer(1,p.x,p.y);p.l=0;}}}
  parts=parts.filter(p=>p.l>0);
  // 아이템
- for(const it of items){if(it.got)continue;const d=Math.hypot(it.x-P.x,it.y-P.y);
+ for(const it of items){if(it.got)continue;const d=Math.hypot(it.x-P.x,it.y-P.y);if(evItem(it,d))continue;
   if(it.t==='coin'){if(T-it.born<.3){it.x+=it.vx*.016;it.y+=it.vy*.016*.3;}it.x=Math.max(WL+8,Math.min(WR-8,it.x));it.y=Math.max(WT+10,Math.min(WB-8,it.y));if(solid(it.x,it.y)){it.x+=(320-it.x)*.2;it.y+=(180-it.y)*.2;}if(d<30&&T-it.born>.3){it.x+=(P.x-it.x)*.2;it.y+=(P.y-it.y)*.2;}if(d<6){it.got=1;gold++;snd(1200+Math.random()*300,.05,'square',.025);}continue;}
   if(it.t==='chest'&&!it.open&&d<(it.big?24:11)){it.open=true;snd(520,.12,'square',.04,300);setTimeout(()=>snd(880,.18,'square',.04,500),120);
    if(it.has==='key'){hasKey=true;say('상자 안에 열쇠가 — 계단을 찾아라');}
@@ -266,13 +267,13 @@ function h2(x,y){let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return (
 function segBar(cx,top,hp,max,col,w){w=w||20;const x0=Math.round(cx-w/2),f=Math.max(0,Math.min(1,hp/max));g.fillStyle='#000';g.fillRect(x0-1,top-1,w+2,5);g.fillStyle='#3a1418';g.fillRect(x0,top,w,3);g.fillStyle=col;g.fillRect(x0,top,Math.round(w*f),3);g.fillStyle='rgba(255,255,255,.35)';g.fillRect(x0,top,Math.round(w*f),1);}
 function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.round((Math.random()-.5)*4):0,sy=shake>0?Math.round((Math.random()-.5)*4):0;
  const ox=Math.round(cam.x)-sx,oy=Math.round(cam.y)-sy;
- drawRoom(ox,oy);{const rg=regionOf(stage+1);if(rg.mul&&!(cur&&cur.type==='boss')){g.save();g.globalCompositeOperation='multiply';g.fillStyle=rg.mul;g.fillRect(0,0,VW,VH);g.restore();}}
+ drawRoom(ox,oy);trapDraw(ox,oy);{const rg=regionOf(stage+1);if(rg.mul&&!(cur&&cur.type==='boss')){g.save();g.globalCompositeOperation='multiply';g.fillStyle=rg.mul;g.fillRect(0,0,VW,VH);g.restore();}}
  // 아이템
  for(const it of items){const px=Math.round(it.x-ox),py=Math.round(it.y-oy);
   if(it.t==='chest'&&it.big){if(it.open){g.drawImage(TI.chestO,px-16,py-18,32,32);}}
   else if(it.t==='chest'){g.drawImage(it.open?TI.chestO:TI.chest,px-8,py-8);if(it.open&&it.has==='gem'){g.fillStyle=it.gem;g.fillRect(px-1,py-11-Math.round(Math.sin(T*3)),3,3);}}
   else if(it.t==='coin'){const f=Math.floor(T*8+it.x)%4;g.fillStyle='#0b0a0c';g.fillRect(px-2,py-2,4,4);g.fillStyle=f===2?'#a07a20':'#f0c040';g.fillRect(px-1+(f===1||f===3?0:0),py-1,f===2?1:2,2);}
-  else{const s=it.t==='key'?SP.key:SP.potion;g.drawImage(s,px-(s.width>>1),py-(s.height>>1)+Math.round(Math.sin(T*3)*1.5));}}
+  else if(evDraw(it,px,py)){}else{const s=it.t==='key'?SP.key:SP.potion;g.drawImage(s,px-(s.width>>1),py-(s.height>>1)+Math.round(Math.sin(T*3)*1.5));}}
  // 횃불
  // 적
  for(const e of ents){const fr=Math.floor(e.ph)%2,k=e.type,base=SP[k][0],L=e.face<0;let s=(e.atkT>0&&MA[k])?MA[k][L?1:0]:(L&&MF[k][fr]?MF[k][fr]:SP[k][fr]);const bw=base.width,px=Math.round(L?e.x-ox+bw/2-s.width:e.x-ox-bw/2),py=Math.round(e.y-oy-s.height+3);
@@ -306,7 +307,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.r
  for(const t of torches)light(t.x-ox,t.y-oy,34+Math.sin(T*7+t.x)*2,.85);
  for(const p of parts)if(p.orb)light(p.x-ox,p.y-oy,10,.7);
  if(boss)light(boss.x-ox,boss.y-oy,26,.5);
- for(const it of items){if(it.t==='key')light(it.x-ox,it.y-oy,10+Math.sin(T*4)*2,.6);if(it.t==='chest'&&!it.open)light(it.x-ox,it.y-oy,7+Math.sin(T*3+it.x)*1.5,.45);}
+ for(const it of items){if(it.t==='note'&&!it.got)light(it.x-ox,it.y-oy,14+Math.sin(T*3)*3,.7);if(it.t==='merchant')light(it.x-ox,it.y-oy,22,.6);if(it.t==='altar'&&!it.used)light(it.x-ox,it.y-oy,18,.6);if(it.t==='key')light(it.x-ox,it.y-oy,10+Math.sin(T*4)*2,.6);if(it.t==='chest'&&!it.open)light(it.x-ox,it.y-oy,7+Math.sin(T*3+it.x)*1.5,.45);}
  g.drawImage(lit,0,0);
  g.save();g.globalCompositeOperation='lighter';for(const t of torches){const r=40+Math.sin(T*7+t.x)*2+Math.sin(T*17+t.y)*1.2,x0=t.x-ox,y0=t.y-oy-6;const wg=g.createRadialGradient(x0,y0,0,x0,y0,r);wg.addColorStop(0,cur&&cur.type==='boss'?'rgba(255,40,40,.28)':'rgba('+regionOf(stage+1).torch+',.24)');wg.addColorStop(.5,cur&&cur.type==='boss'?'rgba(160,20,20,.10)':'rgba(200,90,30,.08)');wg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=wg;g.fillRect(x0-r,y0-r,r*2,r*2);}g.restore();
  // 불빛 색감
@@ -335,7 +336,7 @@ function storyPlay(lines,cb){let i=0;const box=$('story'),t=$('stT');MODE='story
  const show=()=>{t.textContent='';const L=lines[i];let k=0;clearInterval(storyPlay._iv);storyPlay._iv=setInterval(()=>{k++;t.textContent=L.slice(0,k);if(k>=L.length)clearInterval(storyPlay._iv);},40);};
  const end=()=>{clearInterval(storyPlay._iv);box.classList.add('hide');cb();};
  $('stN').onclick=()=>{if(t.textContent.length<lines[i].length){clearInterval(storyPlay._iv);t.textContent=lines[i];return;}i++;if(i>=lines.length)end();else show();};$('stS').onclick=end;show();}
-function saveCk(){try{if(stage>(+localStorage.getItem('b404_best')||0))localStorage.setItem('b404_best',stage);}catch(e){}const o={best:Math.max(stage,(typeof bestF==='function'?bestF():0)),stage,hp:P.hp,max:P.max,pots:P.pots||0,gold,gems,kills,deaths,hero:HSEL,t:Date.now()};try{localStorage.setItem('b404_save',JSON.stringify(o));}catch(e){}if(typeof cloudSave==='function')cloudSave(o);}
+function saveCk(){try{if(stage>(+localStorage.getItem('b404_best')||0))localStorage.setItem('b404_best',stage);}catch(e){}const o={best:Math.max(stage,(typeof bestF==='function'?bestF():0)),stage,hp:P.hp,max:P.max,atkB:P.atkB||0,pots:P.pots||0,gold,gems,kills,deaths,hero:HSEL,t:Date.now()};try{localStorage.setItem('b404_save',JSON.stringify(o));}catch(e){}if(typeof cloudSave==='function')cloudSave(o);}
 function loadCk(){try{return JSON.parse(localStorage.getItem('b404_save')||'null');}catch(e){return null;}}
 function paintCont(){const c=loadCk(),b=$('cont');if(!b)return;if(c&&c.stage>0){b.hidden=false;b.textContent='이어하기 · B'+(c.stage+1);}else b.hidden=true;}
 
@@ -420,12 +421,62 @@ function openFlr(){const best=bestF(),L=$('flrList');let h='';const RC=['#4a4250
  L.innerHTML=h;L.querySelectorAll('button').forEach(b=>b.onclick=()=>goFloor(+b.dataset.f));$('title').classList.add('hide');$('flr').classList.remove('hide');MODE='flr';}
 function goFloor(f){$('flr').classList.add('hide');P=null;FLOORS={};drone();load(f);P.max=hs().hp;P.hp=P.max;P.pots=Math.max(2,P.pots||0);MODE='play';t0=performance.now();showBtns(true);saveCk();say(getFloor(f).name,2.4);}
 $('flrBtn').onclick=openFlr;$('flrX').onclick=()=>{$('flr').classList.add('hide');$('title').classList.remove('hide');MODE='title';};
+// ════ 층마다 사건 · 쪽지 ════
+const NOTES={1:'벽에 긁힌 자국 — “돌아가.”\n손톱으로 쓴 글씨다.',2:'떨어진 등불지기 배지.\n뒷면에 ‘7번째’라고 새겨져 있다.',3:'쪽지 — “계단을 셀수록 숫자가 하나씩 모자라.”',4:'누군가의 일기 — “여기선 횃불이 내 그림자보다 늦게 움직여.”',5:'벽에 마을 지도가 그려져 있다.\n우리 집 자리에 붉은 X.',6:'쪽지 — “아래에서 누가 내 이름을 불렀어.\n엄마 목소리였어.”',7:'녹슨 열쇠 꾸러미.\n열쇠마다 마을 사람 이름표가 붙어 있다.',8:'쪽지 — “눈을 감고 걸어. 그게 더 잘 보여.”',9:'벽 가득 같은 문장.\n“불을 끄지 마. 불을 끄지 마. 불을 끄지 마. 불을”',
+11:'이름 없는 묘비.\n날짜만 새겨져 있다 — 매년, 같은 날.',12:'관 뚜껑 안쪽에 손톱 자국.\n안에서 긁은 것이다.',13:'마을 장부 한 장.\n“올해의 등불세 — 한 명.”',14:'쪽지 — “장부를 본 사람은 다음 해 명단에 오른다.”',15:'뼈 더미 사이 아이 신발 한 짝.\n어디서 본 듯한 색의 끈이 묶여 있다.',16:'장부 다음 장은 명단이다.\n작년에 ‘이사 갔다’던 이웃들의 이름.',17:'벽 글씨 — “아무도 슬퍼하지 않았어.\n아무도 기억하지 못했으니까.”',18:'명단 맨 끝에 빈칸 하나.\n잉크가 아직 마르지 않았다.',19:'해골 하나가 등불을 꼭 끌어안고 있다.\n끝까지 놓지 않았다.',
+21:'이끼가 글자 모양으로 자라 있다.\n“여기 아래는 따뜻해.”',22:'L이라고 서명한 쪽지 — “장부를 봤어. 촌장님이 알고 있었어.”',23:'버섯 갓 안쪽에 작은 불씨가 갇혀 반짝인다.',24:'쪽지 — “마을이 생길 때, 아래의 무언가와 약속을 했대.”',25:'벽화 — 사람들이 줄지어 계단을 내려가고,\n그 위에서 등불이 하나씩 켜진다.',26:'L의 쪽지 — “등불 하나에 한 사람. 그게 약속이래.”',27:'두꺼비 뱃속에서 나온 반지.\n촌장 집안의 문양이다.',28:'쪽지 — “촌장님도 처음엔 울었대.\n지금은 웃으면서 명단을 써.”',29:'아주 작은 글씨 — “올해 명단엔 내 이름을 직접 썼어. — L”',
+31:'얼음 속에 사람 그림자가 갇혀 있다.\n…눈이 움직인 것 같다.',32:'루미의 쪽지 — “내가 가면 올해는 아무도 안 데려간대.”',33:'얼어붙은 편지 — “루미야, 미안하다. — 촌장”',34:'쪽지 — “여기 있는 사람들, 다 살아 있어.\n꿈을 꾸고 있을 뿐이야.”',35:'얼음 벽에 내 얼굴이 비친다.\n표정이 나보다 한 박자 늦다.',36:'루미 — “그런데 약속이 깨졌어. 눈이 더 많이 원해.”',37:'녹은 자리에서 작은 불씨가 나왔다.\n손에 쥐니 웃음소리가 들렸다.',38:'쪽지 — “눈은 등불을 먹을수록 위로 올라와.”',39:'벽 글씨 — “마을 우물이 매년 한 칸씩 깊어지는 거 알아?”',
+41:'녹은 쇳물 속에 등불 틀이 가득하다.\n마을 등불은 여기서 만들어졌다.',42:'쪽지 — “마을 등불은 전부 아래에서 온 거야. 처음부터.”',43:'작업대에 새긴 이름들 — 첫 등불지기들.',44:'그 이름들 맨 위에 ‘루미’.\n그런데 날짜가 백 년 전이다.',45:'쪽지 — “루미는 백 년째 같은 날 사라져.”',46:'벽 글씨 — “루미가 돌아오면 사람들은 루미를 잊어.\n그리고 다시 처음부터.”',47:'불타다 만 일기 — “나는 몇 번째 루미일까.”',48:'쪽지 — “쪽지를 받은 사람만 루미를 기억할 수 있어.”',49:'용광로 안에서 목소리가 들린다.\n“이번엔… 끝까지 와 줘.”',
+51:'서고의 책은 전부 같은 제목이다.\n『올해의 명단』',52:'백 년치 명단.\n해마다 마지막 줄은 같은 이름 — 루미.',53:'책 사이에 끼운 쪽지 — “기억되는 사람은 데려갈 수 없어.”',54:'펼쳐진 책의 글자가\n내 눈앞에서 하나씩 지워지고 있다.',55:'쪽지 — “눈은 기억을 먹어. 잊힌 사람만 데려가.”',56:'책장 뒤 낙서 — “그래서 마을은 잊는 법을 배웠어.”',57:'어린아이 글씨로 수백 번.\n“나 잊지 마. 나 잊지 마. 나 잊지 마.”',58:'명단 맨 끝 빈칸에 이름이 적혀 있다.\n…‘{HERO}’.',59:'쪽지 — “쪽지를 받았다는 건,\n너도 명단에 있다는 뜻이야.”',
+61:'검은 물 위에 등불이 거꾸로 떠다닌다.\n하나하나가 사람 얼굴이다.',62:'쪽지 — “너도 처음이 아니야. 기억 안 나지?”',63:'물속에서 내 것과 똑같은 칼이 녹슨 채 나왔다.',64:'벽에 내 글씨로 쓴 쪽지.\n“다음엔 여기서 오른쪽 방으로 가.”',65:'쪽지 — “넌 매번 여기까지 와서 잊어버려.”',66:'물에 비친 내가 입을 움직인다.\n“이번엔 기억해.”',67:'루미의 목소리 — “네가 일곱 번째로 와 준 거야.”\n(B2에서 주운 배지가 떠오른다.)',68:'쪽지 — “잊지 않으려면 불씨를 하나씩 되찾아.”',69:'검은 물 위에 길이 생긴다.\n되찾은 불씨들이 비춘 길이다.',
+71:'수정 안에 마을 풍경이 갇혀 있다.\n사람들이 멈춰 있다.',72:'쪽지 — “눈은 올라가는 중이야. 마을 바로 아래까지.”',73:'수정에 비친 마을 광장.\n등불이 하나씩 꺼지고 있다.',74:'루미 — “네가 내려온 사이,\n위에서도 사람들이 사라지고 있어.”',75:'수정 조각 속 장부.\n올해 명단이 끝없이 길어진다.',76:'쪽지 — “촌장님이 마지막 페이지에 자기 이름을 썼어.”',77:'수정이 울린다.\n백 개의 목소리가 동시에 — “도와줘.”',78:'쪽지 — “눈을 닫으면 약속도 끝나.\n대신 등불도 전부 꺼져.”',79:'루미 — “등불이 없어도 괜찮아. 서로 기억하면 돼.”',
+81:'제단 위에 백 년치 등불이 쌓여 있다.\n따뜻하고, 무섭다.',82:'쪽지 — “첫 약속을 한 사람은 촌장이 아니었어.”',83:'제단 아래 새긴 글 — ‘빛을 원한 아이.’',84:'루미의 첫 일기 — “어두운 게 무서웠어.\n그래서 아래에서 빛을 빌렸어.”',85:'쪽지 — “약속을 한 것도, 갚는 것도 루미야. 백 년 동안.”',86:'벽 글씨 — “데려가는 게 아니야.\n루미가 스스로 내려가는 거야.”',87:'제단에서 들리는 목소리 — “이번엔 혼자 가지 않을래.”',88:'쪽지 — “눈은 원래 한 아이의 두려움이었어.\n백 년 동안 자랐을 뿐.”',89:'피로 쓴 글씨 — “두려움은 빛으로 못 이겨. 함께 있어야 해.”',
+91:'계단이 숨을 쉰다.\n아래에서 거대한 눈꺼풀이 움직이는 소리.',92:'쪽지 — “눈은 너를 알아. 일곱 번이나 봤으니까.”',93:'벽 가득 그려진 너의 얼굴.\n매번 조금씩 다른 표정이다.',94:'루미 — “지난번 너는 여기서 돌아갔어. 무서워서.”',95:'쪽지 — “괜찮아. 이번엔 쪽지가 하나 더 있잖아.”',96:'언제 넣었는지 모를 쪽지가 주머니에 있다.\n“나 잊지 마. — 너”',97:'목소리들이 하나씩 네 이름을 부른다.\n마을 사람들의 목소리다.',98:'루미 — “위에서 다들 너를 기억하기 시작했어.”',99:'마지막 계단 앞의 쪽지.\n“눈을 뜨고 있어. 절대 감지 마.”'};
+const NOTES_X=['벽에 새 글씨가 생겼다 — “아직이야.”','누군가 방금까지 여기 있었다. 불씨가 따뜻하다.','쪽지 — “더 아래에도 명단이 있어.”','바닥에 발자국. 내 신발과 크기가 같다.','쪽지 — “404층엔 문이 없어. 대신 눈이 있지.”'];
+function noteText(n){const t=NOTES[n]||NOTES_X[n%NOTES_X.length];return t.replace('{HERO}',hs().t);}
+const MLINES=['또 왔구나… 아, 넌 기억 못 하지.','골드는 위에선 쓸모없어. 여기서 써.','나도 한때 명단에 있었지. 지금은 장사나 해.','눈한테 들키지 않게 조용히 골라.','루미? …그 아이 얘긴 하지 마.'];
+function placeEvents(R,k,S,i){}
+function evRooms(S,i){const ks=Object.keys(S.rooms).filter(k=>['roomA','roomB','water'].includes(S.rooms[k])&&k!==S.mapRoom);const sh=ks.sort(()=>Math.random()-.5);const ev={};
+ if(sh[0])ev[sh[0]]='note';const rest=sh.slice(1);
+ if(rest.length&&Math.random()<.4)ev[rest.shift()]='merchant';if(rest.length&&Math.random()<.3)ev[rest.shift()]='altar';if(rest.length&&i>0&&Math.random()<.35)ev[rest.shift()]='trap';if(rest.length&&Math.random()<.2)ev[rest.shift()]='gold';
+ if(!sh[0]){const any=Object.keys(S.rooms).find(k=>S.rooms[k]!=='boss');if(any)ev[any]='note';}return ev;}
+function evSetup(R,kind,i){if(kind==='note')R.items.push({t:'note',x:200+Math.random()*240,y:150+Math.random()*90,n:i+1});
+ if(kind==='merchant')R.items.push({t:'merchant',x:470,y:200});
+ if(kind==='altar')R.items.push({t:'altar',x:320,y:170});
+ if(kind==='gold')for(let j=0;j<6;j++)R.items.push({t:'coin',x:300+Math.random()*40,y:160+Math.random()*30,vx:0,vy:0,z:0,born:-9});
+ if(kind==='trap'){R.trap=[];for(let j=0;j<7;j++)R.trap.push({x:120+Math.random()*400,y:110+Math.random()*170,o:Math.random()*2.4});}}
+function trapStep(){if(!cur||!cur.trap)return;for(const t of cur.trap){const ph=(T+t.o)%2.4;if(ph>1.7&&P.roll<=0&&Math.abs(P.x-t.x)<9&&Math.abs(P.y-t.y)<7)hurtPlayer(1,t.x,t.y-10);}}
+function trapDraw(ox,oy){if(!cur||!cur.trap)return;for(const t of cur.trap){const ph=(T+t.o)%2.4,x=Math.round(t.x-ox),y=Math.round(t.y-oy);g.fillStyle='#1a1418';g.fillRect(x-8,y-5,16,10);g.fillStyle='#3a3238';g.fillRect(x-7,y-4,14,8);
+ const up=ph>1.7?3:ph>1.4?1:0;g.fillStyle=ph>1.4&&ph<1.7?'#a02020':'#9a909a';for(let a=0;a<3;a++)for(let b=0;b<2;b++){const sx=x-5+a*5,sy=y-2+b*4;if(up)g.fillRect(sx,sy-up,1,up+1);else g.fillRect(sx,sy,1,1);}}}
+function evDraw(it,px,py){if(it.t==='note'){g.fillStyle='rgba(255,230,160,'+(.25+Math.sin(T*3)*.15)+')';g.fillRect(px-6,py-5,12,10);g.fillStyle='#0b0a0c';g.fillRect(px-4,py-3,9,7);g.fillStyle='#e8d8a8';g.fillRect(px-3,py-2,7,5);g.fillStyle='#8a6a40';g.fillRect(px-2,py-1,5,1);g.fillRect(px-2,py+1,4,1);return true;}
+ if(it.t==='merchant'){const b=Math.round(Math.sin(T*2));g.fillStyle='rgba(0,0,0,.45)';g.fillRect(px-7,py+3,14,2);g.fillStyle='#0b0a0c';g.fillRect(px-6,py-14+b,12,17);g.fillStyle='#2a2238';g.fillRect(px-5,py-13+b,10,15);g.fillStyle='#3a3050';g.fillRect(px-4,py-13+b,8,4);g.fillStyle='#0b0a0c';g.fillRect(px-3,py-10+b,6,3);g.fillStyle='#ffd870';g.fillRect(px-2,py-9+b,1,1);g.fillRect(px+1,py-9+b,1,1);g.fillStyle='#6a5030';g.fillRect(px+5,py-6+b,5,6);g.fillStyle='#f0c040';g.fillRect(px+6,py-5+b,3,2);
+  if(Math.hypot(P.x-it.x,P.y-it.y)<40){g.font='8px G11';g.textAlign='center';g.fillStyle='#000';g.fillText('그림자 상인',px+1,py-17);g.fillStyle='#d8c8ff';g.fillText('그림자 상인',px,py-18);g.textAlign='left';}return true;}
+ if(it.t==='altar'){g.fillStyle='#0b0a0c';g.fillRect(px-11,py-8,22,13);g.fillStyle=it.used?'#3a3438':'#4a4048';g.fillRect(px-10,py-7,20,11);g.fillStyle=it.used?'#2a2428':'#5a1418';g.fillRect(px-10,py-7,20,2);if(!it.used){const f=Math.sin(T*12)>0;g.fillStyle='#e8e0d0';g.fillRect(px-7,py-11,2,4);g.fillRect(px+5,py-11,2,4);g.fillStyle=f?'#ffb040':'#ff7020';g.fillRect(px-7,py-13,2,2);g.fillRect(px+5,py-13,2,2);g.fillStyle='#a01820';g.fillRect(px-1,py-4,3,3);}
+  if(Math.hypot(P.x-it.x,P.y-it.y)<40&&!it.used){g.font='8px G11';g.textAlign='center';g.fillStyle='#000';g.fillText('피의 제단',px+1,py-16);g.fillStyle='#ff9a9a';g.fillText('피의 제단',px,py-17);g.textAlign='left';}return true;}
+ return false;}
+function evPanel(title,body,btns){MODE='pause';jEnd&&jEnd();showBtns(false);let d=$('evP');if(!d){d=document.createElement('div');d.id='evP';d.className='scr';d.style.zIndex=44;document.body.appendChild(d);}
+ d.innerHTML='<h2 style="margin:0;font-size:20px">'+title+'</h2><p style="margin:0;max-width:440px;line-height:1.8;font-size:14px;white-space:pre-line">'+body+'</p><div style="display:flex;flex-direction:column;gap:8px;min-width:260px">'+btns.map((b,i)=>'<button class="btn" data-i="'+i+'"'+(b.off?' disabled style="opacity:.4"':'')+'>'+b.t+'</button>').join('')+'</div>';d.classList.remove('hide');
+ d.querySelectorAll('button').forEach(el=>el.onclick=()=>{const b=btns[+el.dataset.i];if(b.off)return;const keep=b.f&&b.f();if(!keep){d.classList.add('hide');MODE='play';showBtns(true);}});}
+function openShop(){const line=MLINES[Math.floor(Math.random()*MLINES.length)];const draw=()=>evPanel('그림자 상인','“'+line+'”\n가진 골드 '+gold,[
+ {t:'물약 한 병 · 30골드',off:gold<30||(P.pots||0)>=3,f(){gold-=30;P.pots=(P.pots||0)+1;snd(760,.12,'triangle',.04,200);draw();return 1;}},
+ {t:'생명의 등불 (최대 체력 +125) · 80골드',off:gold<80||P.max>=8,f(){gold-=80;P.max=Math.min(8,P.max+1);P.hp=Math.min(P.max,P.hp+1);healFx();draw();return 1;}},
+ {t:'칼 갈기 (공격 +1) · 120골드',off:gold<120||(P.atkB||0)>=3,f(){gold-=120;P.atkB=(P.atkB||0)+1;snd(900,.15,'square',.04,-300);say('칼이 날카로워졌다');draw();return 1;}},
+ {t:'이 층의 지도 · 40골드',off:gold<40||hasMap,f(){gold-=40;hasMap=true;say('지도를 샀다 — 이 층이 모두 보인다');draw();return 1;}},
+ {t:'그냥 간다'}]);draw();}
+function openAltar(it){evPanel('피의 제단','제단 위에 마른 핏자국이 있다.\n“피를 바치면 무언가를 준다.”',[
+ {t:'피를 바친다 (체력 -250)',off:P.hp<=2,f(){P.hp-=2;dmgTxt(P.x,P.y-30,'-250','#ff6a6a');it.used=1;const r=Math.random();
+   if(r<.4){P.atkB=Math.min(3,(P.atkB||0)+1);say('제단이 칼에 피를 묻혔다 — 공격 +1',3);}else if(r<.75){P.pots=Math.min(3,(P.pots||0)+2);say('제단이 물약 두 병을 토해냈다',3);}else{gold+=80;say('제단 아래서 골드가 쏟아졌다 — 그리고 누군가 웃었다',3);}snd(80,.4,'sawtooth',.06,-20);}},
+ {t:'그냥 간다'}]);}
+function evItem(it,d){if(it.t==='note'&&d<12&&!locked()){it.got=1;snd(660,.2,'sine',.04,200);jEnd&&jEnd();showBtns(false);storyPlay(['B'+(stage+1)+' · '+noteText(it.n)],()=>{MODE='play';showBtns(true);});return true;}
+ if(it.t==='merchant'){if(d>36)it.cd=0;if(d<20&&!it.cd&&!locked()){it.cd=1;openShop();}return true;}
+ if(it.t==='altar'){if(d>36)it.cd=0;if(d<18&&!it.cd&&!it.used&&!locked()){it.cd=1;openAltar(it);}return true;}
+ return false;}
 // ════ 루프 ════
 let last=performance.now();
 function loop(now){const dt=Math.min(.04,(now-last)/1000);last=now;T+=dt;if(MODE==='play')update(dt);if(map)draw();updHud();requestAnimationFrame(loop);}
 function showBtns(on){const touch=matchMedia('(pointer:coarse)').matches;$('atk').classList.toggle('hide',!on||!touch);$('dash').classList.toggle('hide',!on||!touch);$('heal').classList.toggle('hide',!on||!touch);updHeal();}
 function start(){gold=0;gems=0;kills=0;deaths=0;FLOORS={};$('title').classList.add('hide');drone();storyPlay(STORY0,()=>{P=null;load(0);MODE='play';t0=performance.now();showBtns(true);saveCk();});}
-function cont(){const c=loadCk();if(!c)return start();gold=c.gold||0;gems=c.gems||0;kills=c.kills||0;deaths=c.deaths||0;if(c.hero&&HEROES[c.hero]){HSEL=c.hero;HERO=HEROES[HSEL];}P=null;FLOORS={};$('title').classList.add('hide');drone();load(c.stage);P.max=c.max||6;P.hp=Math.max(2,Math.min(P.max,c.hp||6));P.pots=c.pots||0;MODE='play';t0=performance.now();showBtns(true);say('이어하기 — '+getFloor(c.stage).name,2.4);}
+function cont(){const c=loadCk();if(!c)return start();gold=c.gold||0;gems=c.gems||0;kills=c.kills||0;deaths=c.deaths||0;if(c.hero&&HEROES[c.hero]){HSEL=c.hero;HERO=HEROES[HSEL];}P=null;FLOORS={};$('title').classList.add('hide');drone();load(c.stage);P.max=c.max||6;P.atkB=c.atkB||0;P.hp=Math.max(2,Math.min(P.max,c.hp||6));P.pots=c.pots||0;MODE='play';t0=performance.now();showBtns(true);say('이어하기 — '+getFloor(c.stage).name,2.4);}
 $('go').onclick=openSel;$('cont').onclick=cont;document.querySelectorAll('.hb').forEach(b=>b.onclick=()=>{HSEL=b.dataset.h;HERO=HEROES[HSEL];document.querySelectorAll('.hb').forEach(x=>x.classList.toggle('on',x===b));paintHero();});
 $('again').onclick=()=>{$('over').classList.add('hide');$('ovT').style.color='';const s=stage;const keepMax=P?P.max:hs().hp;P=null;if(!(MODE==='over'&&$('ovT').textContent==='사망'))FLOORS={};load(MODE==='over'&&$('ovT').textContent==='사망'?s:0);P.max=Math.max(hs().hp,keepMax);P.hp=P.max;MODE='play';showBtns(true);};
 load(0);MODE='title';paintCont();paintFlr();paintHero();requestAnimationFrame(loop);
