@@ -292,7 +292,7 @@ function floorTile0(tx,ty){const v=h2(tx,ty);if(v<.6)return TI['f'+Math.floor(h2
 const FT={};function floorTile(tx,ty){const im=floorTile0(tx,ty);if(!im.complete||!im.naturalWidth)return im;const o=Math.floor(h2(tx*3+1,ty*5+2)*4),k=im.src.length+'_'+im.src.slice(-12)+o;if(FT[k])return FT[k];const cv=document.createElement('canvas');cv.width=TS;cv.height=TS;const q=cv.getContext('2d');q.translate(TS/2,TS/2);q.scale(o&1?-1:1,o&2?-1:1);q.drawImage(im,-TS/2,-TS/2);return FT[k]=cv;}
 function wallTile(tx,ty){const face=tile(tx,ty+1)!=='#';return face?TI['w'+(Math.floor(h2(tx,ty)*2))]:TI.wtop;}
 function h2(x,y){let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return ((h^(h>>16))>>>0)/4294967295;}
-function segBar(cx,top,hp,max,col,w){w=w||20;const x0=Math.round(cx-w/2),f=Math.max(0,Math.min(1,hp/max));g.fillStyle='rgba(0,0,0,.85)';g.fillRect(x0-1,top+1,w+2,3);g.fillStyle='#3a1418';g.fillRect(x0,top+2,w,1);g.fillStyle=col;g.fillRect(x0,top+2,Math.round(w*f),1);}
+function segBar(cx,top,hp,max,col,w){w=w||20;const x0=Math.round(cx-w/2),f=Math.max(0,Math.min(1,hp/max));g.fillStyle='rgba(0,0,0,.55)';g.fillRect(x0,top+2,w,1);g.fillStyle=col;g.fillRect(x0,top+2,Math.round(w*f),1);}
 function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.round((Math.random()-.5)*4):0,sy=shake>0?Math.round((Math.random()-.5)*4):0;
  const ox=Math.round(cam.x)-sx,oy=Math.round(cam.y)-sy;
  drawRoom(ox,oy);drawDeco(ox,oy);trapDraw(ox,oy);{const rg=regionOf(stage+1);if(rg.mul&&!(cur&&cur.type==='boss')){g.save();g.globalCompositeOperation='multiply';g.fillStyle=rg.mul;g.fillRect(0,0,VW,VH);g.restore();}}
