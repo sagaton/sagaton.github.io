@@ -91,7 +91,7 @@ const STAGES=[
 // ════ 층 자동 생성 (B1 → B404) ════
 const FNAMES=['축축한 회랑','뼈의 납골당','잊힌 감옥','이끼 낀 우물','녹슨 무기고','속삭이는 서고','검은 수로','무너진 예배당','버려진 광산','붉은 제단','얼어붙은 묘실','거꾸로 선 탑'];
 let FLOORS={},hasMap=false;
-function floorName(n){return 'B'+n+'층 · '+(n===404?'끝없는 심연':FNAMES[(n-1)%FNAMES.length]);}
+function floorName(n){return 'B'+n+'층 · '+(n===404?'끝없는 심연':regionOf(n).n);}
 function genFloor(n){const boss=n%10===0||n===404,target=Math.min(4+Math.floor(n/3),11);
  for(let t=0;t<200;t++){const R={'0,1':'start','0,0':'x'},keys=['0,0'];let guard=0;
   while(keys.length<target&&guard++<500){const k=keys[Math.floor(Math.random()*keys.length)],d='uulrrld'[Math.floor(Math.random()*7)],nk=nbKey(k,d),y=+nk.split(',')[1];if(R[nk]||y>0)continue;R[nk]='x';keys.push(nk);}
@@ -110,6 +110,22 @@ function getFloor(i){if(FLOORS[i])return FLOORS[i];let F;if(i<2){F=Object.assign
 function pathDir(from,to){if(!to||from===to)return null;const prev={[from]:null},q=[from];while(q.length){const k=q.shift();if(k===to)break;const Rm=RS[k];for(const d in DIRS){if(!Rm.doors[d])continue;const nk=nbKey(k,d);if(RS[nk]&&!(nk in prev)){prev[nk]=[k,d];q.push(nk);}}}if(!(to in prev))return null;let k=to,d=null;while(prev[k]&&prev[k][0]!==from){k=prev[k][0];}return prev[k]?prev[k][1]:null;}
 function goalKey(){const S=getFloor(stage);const f=t=>Object.keys(S.rooms).find(k=>S.rooms[k]===t);if(S.boss)return f('boss');return hasKey?f('stairs'):f('treasure');}
 function goalText(){const S=getFloor(stage);if(boss&&boss.hp>0)return '심연의 문지기를 쓰러뜨려라';if(locked())return '몬스터를 모두 쓰러뜨려라';if(S.boss)return cur.bossDone?'위쪽 구멍으로 더 내려가라':'맨 끝 보스 방을 찾아라';if(!hasKey)return '열쇠가 든 큰 상자를 찾아라';return cur.type==='stairs'?'위쪽 계단으로 내려가라':'계단 방을 찾아라';}
+const REGIONS=[
+ {n:'축축한 회랑',mul:null,fx:'drip',torch:'255,150,60',mix:{}},
+ {n:'뼈의 납골당',mul:'#c8b8a0',fx:'dust',torch:'230,200,150',mix:{slime:'skel'}},
+ {n:'이끼 낀 동굴',mul:'#9ad890',fx:'spore',torch:'170,255,120',mix:{skel:'slime'}},
+ {n:'얼어붙은 묘실',mul:'#a8c8ff',fx:'snow',torch:'150,210,255',mix:{}},
+ {n:'불타는 용광로',mul:'#ffa070',fx:'ember',torch:'255,110,40',mix:{slime:'bat'}},
+ {n:'잠긴 서고',mul:'#c0a0e8',fx:'page',torch:'200,150,255',mix:{}},
+ {n:'검은 수로',mul:'#80b8b8',fx:'drip',torch:'110,230,210',mix:{skel:'slime'}},
+ {n:'수정 광산',mul:'#a0f0ff',fx:'spark',torch:'120,255,255',mix:{}},
+ {n:'핏빛 제단',mul:'#ff8080',fx:'ember',torch:'255,40,40',mix:{slime:'skel'}},
+ {n:'심연의 문턱',mul:'#8070a0',fx:'spore',torch:'255,30,60',mix:{}}];
+function regionOf(n){return REGIONS[Math.floor((n-1)/10)%REGIONS.length];}
+let AMB=[];
+function ambient(){const rg=regionOf(stage+1);if(AMB.length<40&&Math.random()<.5){const f=rg.fx;AMB.push({x:Math.random()*VW,y:f==='ember'||f==='spore'?VH+4:-4,vx:(Math.random()-.5)*(f==='snow'?12:6),vy:f==='ember'?-18-Math.random()*14:f==='spore'?-6-Math.random()*6:f==='drip'?60+Math.random()*30:f==='page'?8:10+Math.random()*10,l:6,f});}
+ for(const a of AMB){a.x+=a.vx/60;a.y+=a.vy/60;a.l-=1/60;if(a.f==='snow'||a.f==='page')a.x+=Math.sin(T*2+a.y*.1)*.3;const c={drip:'rgba(140,190,230,.6)',dust:'rgba(220,200,170,.35)',spore:'rgba(170,255,140,.55)',snow:'rgba(240,248,255,.8)',ember:'rgba(255,150,60,.85)',page:'rgba(230,220,200,.7)',spark:'rgba(170,255,255,.9)'}[a.f];g.fillStyle=c;if(a.f==='drip')g.fillRect(Math.round(a.x),Math.round(a.y),1,3);else if(a.f==='page')g.fillRect(Math.round(a.x),Math.round(a.y),3,2);else if(a.f==='spark'){if(Math.sin(T*10+a.x)>.3)g.fillRect(Math.round(a.x),Math.round(a.y),1,1);}else g.fillRect(Math.round(a.x),Math.round(a.y),1,1);}
+ AMB=AMB.filter(a=>a.l>0&&a.y>-8&&a.y<VH+8);}
 // ════ 상태 ════
 let gold=0,gems=0,kills=0,stGems=0,stGemTotal=0;let MODE='title',T=0,stage=0,map=true,P,ents=[],items=[],parts=[],torches=[],cam={x:0,y:0},shake=0,hasKey=false,stairsOpen=false,boss=null,msg='',msgT=0,deaths=0,t0=0;
 let RS={},cur=null,curKey='',fade=0;
@@ -124,7 +140,7 @@ function solid(px,py){if(!cur)return true;
  if(py<WT)return !(inX&&openDoor('u'));if(py>WB)return !(inX&&openDoor('d'));
  if(px<WL)return !(inY&&openDoor('l'));if(px>WR)return !(inY&&openDoor('r'));return false;}
 function rpos(){for(let n=0;n<40;n++){const x=90+Math.random()*460,y=90+Math.random()*190;if(!solid(x,y)&&!solid(x+6,y+6)&&!solid(x-6,y-6))return [x,y];}return [320,180];}
-function spawn(R,type,n){for(let i=0;i<n;i++){const [x,y]=rpos();R.ents.push(mk(type,x,y));}}
+function spawn(R,type,n){type=regionOf(stage+1).mix[type]||type;for(let i=0;i<n;i++){const [x,y]=rpos();R.ents.push(mk(type,x,y));}}
 function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;const k4=Math.min(5,Math.floor(i/4)),h2_=Math.floor(k4/2);boss=null;parts=[];stGems=0;stGemTotal=0;const gc=['#5ad0ff','#ff5a8a','#c8a0ff','#7ad06a'];
  if(!P||P.hp<=0)P={pots:2,x:320,y:250,vx:0,vy:0,hp:P&&P.hp>0?P.hp:hs().hp,max:hs().hp,face:1,dir:{x:1,y:0},atk:0,atkCd:0,inv:0,roll:0,rollCd:0,walk:0};
  for(const k in S.rooms){const type=S.rooms[k],R={type,ents:[],items:[],seen:false,doors:{}};RS[k]=R;cur=R;
@@ -138,7 +154,7 @@ function load(i){stage=i;const S=getFloor(i);RS={};hasKey=false;hasMap=false;con
   if(k===S.mapRoom)R.items.push({t:'chest',x:440,y:120,has:'map'});
   if(type==='boss')R.boss=true;}
  if(S.rooms[Object.keys(S.rooms).find(k=>S.rooms[k]==='boss')])stGemTotal++;
- curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':S.name,2.6);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);}
+ curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':(i%10===0?'새로운 지역 — '+regionOf(i+1).n:S.name),2.8);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);}
 function enter(k,from){if(cur&&RS[curKey]===cur){cur.ents=ents;cur.items=items;}curKey=k;cur=RS[k];cur.seen=true;ents=cur.ents;items=cur.items;parts=[];fade=.25;
  if(from==='u'){P.x=320;P.y=WB-10;}else if(from==='d'){P.x=320;P.y=WT+12;}else if(from==='l'){P.x=WR-10;P.y=170;}else if(from==='r'){P.x=WL+10;P.y=170;}else{P.x=320;P.y=250;}
  P.vx=P.vy=0;torches=TORCH.map(([x,y])=>({x,y}));
@@ -243,7 +259,7 @@ function h2(x,y){let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return (
 function segBar(cx,top,hp,max,col,w){w=w||20;const x0=Math.round(cx-w/2),f=Math.max(0,Math.min(1,hp/max));g.fillStyle='#000';g.fillRect(x0-1,top-1,w+2,5);g.fillStyle='#3a1418';g.fillRect(x0,top,w,3);g.fillStyle=col;g.fillRect(x0,top,Math.round(w*f),3);g.fillStyle='rgba(255,255,255,.35)';g.fillRect(x0,top,Math.round(w*f),1);}
 function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.round((Math.random()-.5)*4):0,sy=shake>0?Math.round((Math.random()-.5)*4):0;
  const ox=Math.round(cam.x)-sx,oy=Math.round(cam.y)-sy;
- drawRoom(ox,oy);
+ drawRoom(ox,oy);{const rg=regionOf(stage+1);if(rg.mul&&!(cur&&cur.type==='boss')){g.save();g.globalCompositeOperation='multiply';g.fillStyle=rg.mul;g.fillRect(0,0,VW,VH);g.restore();}}
  // 아이템
  for(const it of items){const px=Math.round(it.x-ox),py=Math.round(it.y-oy);
   if(it.t==='chest'&&it.big){if(it.open){g.drawImage(TI.chestO,px-16,py-18,32,32);}}
@@ -285,13 +301,13 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.r
  if(boss)light(boss.x-ox,boss.y-oy,26,.5);
  for(const it of items){if(it.t==='key')light(it.x-ox,it.y-oy,10+Math.sin(T*4)*2,.6);if(it.t==='chest'&&!it.open)light(it.x-ox,it.y-oy,7+Math.sin(T*3+it.x)*1.5,.45);}
  g.drawImage(lit,0,0);
- g.save();g.globalCompositeOperation='lighter';for(const t of torches){const r=40+Math.sin(T*7+t.x)*2+Math.sin(T*17+t.y)*1.2,x0=t.x-ox,y0=t.y-oy-6;const wg=g.createRadialGradient(x0,y0,0,x0,y0,r);wg.addColorStop(0,cur&&cur.type==='boss'?'rgba(255,40,40,.28)':'rgba(255,150,60,.22)');wg.addColorStop(.5,cur&&cur.type==='boss'?'rgba(160,20,20,.10)':'rgba(200,90,30,.08)');wg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=wg;g.fillRect(x0-r,y0-r,r*2,r*2);}g.restore();
+ g.save();g.globalCompositeOperation='lighter';for(const t of torches){const r=40+Math.sin(T*7+t.x)*2+Math.sin(T*17+t.y)*1.2,x0=t.x-ox,y0=t.y-oy-6;const wg=g.createRadialGradient(x0,y0,0,x0,y0,r);wg.addColorStop(0,cur&&cur.type==='boss'?'rgba(255,40,40,.28)':'rgba('+regionOf(stage+1).torch+',.24)');wg.addColorStop(.5,cur&&cur.type==='boss'?'rgba(160,20,20,.10)':'rgba(200,90,30,.08)');wg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=wg;g.fillRect(x0-r,y0-r,r*2,r*2);}g.restore();
  // 불빛 색감
  g.globalCompositeOperation='overlay';const wg0=g.createRadialGradient(P.x-ox,P.y-oy,0,P.x-ox,P.y-oy,60);g.globalCompositeOperation='source-over';
  {const vg=g.createRadialGradient(VW/2,VH/2,VH*.45,VW/2,VH/2,VW*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=vg;g.fillRect(0,0,VW,VH);}
  // 저체력 붉은 테두리
  if(P.hp<=2){const a=.25+Math.sin(T*5)*.12;const vg=g.createRadialGradient(VW/2,VH/2,VH*.3,VW/2,VH/2,VW*.6);vg.addColorStop(0,'rgba(120,0,0,0)');vg.addColorStop(1,'rgba(140,0,0,'+a+')');g.fillStyle=vg;g.fillRect(0,0,VW,VH);}
- drawMini();if(MODE==='play'){
+ ambient();drawMini();if(MODE==='play'){
   if(hasMap&&!locked()){const d=pathDir(curKey,goalKey());if(d){const pos={u:[320,WT+14],d:[320,WB-12],l:[WL+14,166],r:[WR-14,166]}[d],ax=Math.max(12,Math.min(VW-12,Math.round(pos[0]-ox))),ay=Math.max(22,Math.min(VH-14,Math.round(pos[1]-oy)))+Math.round(Math.sin(T*6)*2),v={u:[0,-1],d:[0,1],l:[-1,0],r:[1,0]}[d];if(Math.floor(T*3)%3){g.fillStyle='#f0c040';for(let i=0;i<5;i++){const w=5-i;g.fillRect(ax+v[0]*i-(v[1]?w:0)+(v[0]?0:0),ay+v[1]*i-(v[0]?w:0),v[1]?w*2:1,v[0]?w*2:1);}}}}}
  if(fade>0){g.fillStyle='rgba(0,0,0,'+Math.min(1,fade*4)+')';g.fillRect(0,0,VW,VH);fade-=1/60;}
  // HUD
