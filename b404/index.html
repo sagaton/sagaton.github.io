@@ -303,7 +303,7 @@ function update(dt){
    else{stGems++;gems++;gold+=15;say('보물 발견! 💎 '+stGems+' / '+stGemTotal);for(let k=0;k<12;k++)parts.push({x:it.x,y:it.y-4,vx:(Math.random()-.5)*80,vy:-40-Math.random()*60,l:.8,col:it.gem});}continue;}
   if(it.t==='chest')continue;
   if(it.t==='key'&&d<8){it.got=1;hasKey=true;say('열쇠를 얻었다 — 계단을 찾아라');snd(880,.15,'square',.04,400);}
-  if(it.t==='potion'&&d<8){if(P.hp<=P.max-2||(P.pots||0)>=3){if(P.hp<P.max){it.got=1;P.hp=Math.min(P.max,P.hp+2);say('체력 회복');snd(660,.15,'triangle',.05,300);healFx();}}else{it.got=1;P.pots=(P.pots||0)+1;say('물약을 챙겼다 ('+P.pots+'/3)');snd(760,.12,'triangle',.04,200);}}
+  if(it.t==='potion'&&d<8){if(P.hp<=P.max-2||(P.pots||0)>=3){if(P.hp>=P.max&&(P.pots||0)>=3){if(!it._m||T-it._m>2.5){it._m=T;say('물약이 가득하다 (3/3) — 체력이 줄면 마실 수 있다',2);}}else if(P.hp<P.max){it.got=1;P.hp=Math.min(P.max,P.hp+2);say('체력 회복');snd(660,.15,'triangle',.05,300);healFx();}}else{it.got=1;P.pots=(P.pots||0)+1;say('물약을 챙겼다 ('+P.pots+'/3)');snd(760,.12,'triangle',.04,200);}}
   }
  items=items.filter(i=>!i.got);
  // 카메라
@@ -323,7 +323,7 @@ function draw(){g.fillStyle='#000';g.fillRect(0,0,VW,VH);const sx=shake>0?Math.r
  // 아이템
  for(const it of items){const px=Math.round(it.x-ox),py=Math.round(it.y-oy);
   if(it.t==='chest'&&it.big){if(it.open){g.drawImage(TI.chestO,px-16,py-18,32,32);}}
-  else if(it.t==='chest'){g.drawImage(it.open?TI.chestO:TI.chest,px-8,py-8);if(it.open&&it.has==='gem'){g.fillStyle=it.gem;g.fillRect(px-1,py-11-Math.round(Math.sin(T*3)),3,3);}}
+  else if(it.t==='chest'){g.drawImage(it.open?TI.chestO:TI.chest,px-8,py-8);}
   else if(it.t==='coin'){const im=FXI['coin'+(Math.floor(T*8+it.x)%4)];if(im&&im.naturalWidth)g.drawImage(im,px-(im.width>>1),py-(im.height>>1));}
   else if(evDraw(it,px,py)){}else{const s=it.t==='key'?SP.key:SP.potion;g.drawImage(s,px-(s.width>>1),py-(s.height>>1)+Math.round(Math.sin(T*3)*1.5));}}
  // 횃불
@@ -427,7 +427,7 @@ addEventListener('resize',()=>setTimeout(placeHud,50));
 let hudT=0;function updHud(){const h=$('hudx');if(!h)return;const on=MODE==='play'&&P;h.classList.toggle('hide',!on);$('pzB').classList.toggle('hide',!on);if(!on)return;if(T-hudT<.08)return;hudT=T;placeHud();
  const f=Math.max(0,P.hp)/P.max;$('hxB').style.width=(f*100)+'%';$('hxB').style.background=f>.5?'#5ad06a':f>.25?'#f0c040':'#e83a3a';h.querySelector('.hp').classList.toggle('low',f>0&&f<=.25);$('hxT').textContent=Math.max(0,P.hp)*125+' / '+P.max*125;
  $('hxP').textContent='Lv '+(P.lv||1)+' ('+(P.xp||0)+'/'+lvNeed(P.lv||1)+')  ·  물약 ×'+(P.pots||0)+(hasKey&&!boss?'  ·  열쇠 있음':'')+(hasMap?'  ·  지도':'');$('hxG').textContent='목표 · '+goalText();
- {const rs=(P.rel||[]).join(',');const hr=$('hxR');if(hr&&hr.dataset.v!==rs){hr.dataset.v=rs;hr.innerHTML=(P.rel||[]).map(k=>{const r=REL.find(x=>x.k===k);return r?'<span title="'+r.n+' — '+r.d+'">'+relImg(r,18)+'</span>':'';}).join('');}}$('hxF').textContent='B'+(stage+1);$('hxGo').textContent='골드 '+gold;$('hxGe').textContent='보물 '+stGems+'/'+stGemTotal;$('hxK').textContent='처치 '+kills;
+ {const rs=(P.rel||[]).join(',');const hr=$('hxR');if(hr&&hr.dataset.v!==rs){hr.dataset.v=rs;hr.innerHTML=(P.rel||[]).map(k=>{const r=REL.find(x=>x.k===k);return r?'<span title="'+r.n+' — '+r.d+'">'+relImg(r,18)+'</span>':'';}).join('');}}updHeal();$('hxF').textContent='B'+(stage+1);$('hxGo').textContent='골드 '+gold;$('hxGe').textContent='보물 '+stGems+'/'+stGemTotal;$('hxK').textContent='처치 '+kills;
  updMap();const m=$('hxM');m.textContent=msg;m.style.opacity=msgT>0?Math.min(1,msgT*2):0;
  const bb=$('hxBoss');if(boss&&boss.hp>0){bb.style.display='block';bb.querySelector('span').textContent=BOSSN[Math.floor(stage/10)%10]+'  '+boss.hp*125+' / '+boss.max*125;bb.querySelector('b').style.width=(boss.hp/boss.max*100)+'%';}else bb.style.display='none';}
 
