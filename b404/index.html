@@ -206,7 +206,7 @@ function checkExit(){if(P.y<WT-10){if((cur.type==='stairs'&&hasKey)||(cur.type==
  if(P.y>WB+12){enter(nbKey(curKey,'d'),'d');return true;}if(P.x<WL-10){enter(nbKey(curKey,'l'),'l');return true;}if(P.x>WR+10){enter(nbKey(curKey,'r'),'r');return true;}return false;}
 function drawRoom(ox,oy){const im=RIMG[cur.type];if(im.complete)g.drawImage(im,-ox,-oy);
  const vis={u:cur.type!=='stairs',d:true};
- for(const d of ['u','d']){if(vis[d]&&!cur.doors[d]){const sy=d==='u'?0:WB-2,h=d==='u'?WT+2:RH-WB+2;if(im.complete)g.drawImage(im,36,sy,DX1-DX0+16,h,DX0-8-ox,sy-oy,DX1-DX0+16,h);}}
+ for(const d of ['u','d']){if(vis[d]&&!cur.doors[d]){const sy=d==='u'?0:WB-2,h=d==='u'?WT+2:RH-WB+2,pim=(cur.type==='treasure'&&RIMG.roomA&&RIMG.roomA.complete)?RIMG.roomA:im;if(pim.complete)g.drawImage(pim,36,sy,DX1-DX0+16,h,DX0-8-ox,sy-oy,DX1-DX0+16,h);}}
  for(const d of ['l','r'])if(cur.doors[d]){const x=d==='l'?0:WR;const gr=g.createLinearGradient(d==='l'?WL-ox:WR-ox,0,d==='l'?-ox:RW-ox,0);gr.addColorStop(0,'rgba(0,0,0,.55)');gr.addColorStop(1,'rgba(0,0,0,.95)');g.fillStyle=gr;g.fillRect(x-ox,DY0-oy,RW-WR,DY1-DY0);}
  if((cur.type==='stairs'&&hasKey)||(cur.type==='boss'&&cur.bossDone)){g.fillStyle='rgba(0,0,0,.85)';g.fillRect(289-ox,28-oy,62,32);for(let i=0;i<4;i++){g.fillStyle='rgba(90,84,80,'+(.5-i*.1)+')';g.fillRect(293+i*2-ox,52-i*7-oy,54-i*4,3);}}
  if(locked()){g.fillStyle='#1c1a1e';const bar=(x,y,w,h)=>{g.fillStyle='#16141a';g.fillRect(x-ox,y-oy,w,h);g.fillStyle='#6a6670';g.fillRect(x-ox,y-oy,1,h);};
