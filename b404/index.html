@@ -136,7 +136,7 @@ function drawDeco(ox,oy){if(!cur)return;if(!cur.deco){const L=[],seed=(stage+1)*
  const S=DECI[Math.floor(stage/10)%DECI.length];for(const o of cur.deco){const im=S[o.i];if(im&&im.naturalWidth)g.drawImage(im,Math.round(o.x-ox-(im.width>>1)),Math.round(o.y-oy-im.height));}}
 function regionOf(n){return REGIONS[Math.floor((n-1)/10)%REGIONS.length];}
 let AMB=[];
-function ambient(){const rg=regionOf(stage+1);if(AMB.length<40&&Math.random()<.5){const f=rg.fx;AMB.push({x:Math.random()*VW,y:f==='ember'||f==='spore'?VH+4:-4,vx:(Math.random()-.5)*(f==='snow'?12:6),vy:f==='ember'?-18-Math.random()*14:f==='spore'?-6-Math.random()*6:f==='drip'?60+Math.random()*30:f==='page'?8:10+Math.random()*10,l:6,f});}
+function ambient(){return;const rg=regionOf(stage+1);if(AMB.length<40&&Math.random()<.5){const f=rg.fx;AMB.push({x:Math.random()*VW,y:f==='ember'||f==='spore'?VH+4:-4,vx:(Math.random()-.5)*(f==='snow'?12:6),vy:f==='ember'?-18-Math.random()*14:f==='spore'?-6-Math.random()*6:f==='drip'?60+Math.random()*30:f==='page'?8:10+Math.random()*10,l:6,f});}
  for(const a of AMB){a.x+=a.vx/60;a.y+=a.vy/60;a.l-=1/60;if(a.f==='snow'||a.f==='page')a.x+=Math.sin(T*2+a.y*.1)*.3;const c={drip:'rgba(140,190,230,.6)',dust:'rgba(220,200,170,.35)',spore:'rgba(170,255,140,.55)',snow:'rgba(240,248,255,.8)',ember:'rgba(255,150,60,.85)',page:'rgba(230,220,200,.7)',spark:'rgba(170,255,255,.9)'}[a.f];g.fillStyle=c;if(a.f==='drip')g.fillRect(Math.round(a.x),Math.round(a.y),1,3);else if(a.f==='page')g.fillRect(Math.round(a.x),Math.round(a.y),3,2);else if(a.f==='spark'){if(Math.sin(T*10+a.x)>.3)g.fillRect(Math.round(a.x),Math.round(a.y),1,1);}else g.fillRect(Math.round(a.x),Math.round(a.y),1,1);}
  AMB=AMB.filter(a=>a.l>0&&a.y>-8&&a.y<VH+8);}
 // ════ 상태 ════
