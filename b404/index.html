@@ -209,7 +209,7 @@ function load(i){stage=i;try{EVT.gh=[];EVT.dark=EVT.red=EVT.mir=0;window.DTX=[];
   if(type==='boss')R.boss=true;}
  {for(const hk in MEET){if(MEET[hk].f!==i||UH.includes(hk))continue;const ks=Object.keys(S.rooms).filter(k=>['roomA','roomB','water'].includes(S.rooms[k])&&k!==S.mapRoom);const k=ks.find(k=>!EV[k])||ks[0];if(k){const R=RS[k];R.items=R.items.filter(o=>o.t!=='merchant'&&o.t!=='altar');R.items.push({t:'npc',hk,x:470,y:165});spawn(R,'skel',1);}}}
  if(S.rooms[Object.keys(S.rooms).find(k=>S.rooms[k]==='boss')])stGemTotal++;
- if(hasR('eye'))hasMap=true;if(godOn())hasKey=true;curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':(i%10===0?'새로운 지역 — '+regionOf(i+1).n:S.name),2.8);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);if(i%10!==9&&i<99)setTimeout(()=>{if(MODE==='play'&&stage===i)say('이 층 어딘가에 쪽지가 떨어져 있다 — 지도의 📜',2.6);},3200);}
+ if(hasR('eye'))hasMap=true;if(godOn()){hasKey=true;hasMap=true;}curKey='';ents=[];items=[];enter(S.start,null);say(i===0?'B404 — 맨 아래 404층까지 내려가라':(i%10===0?'새로운 지역 — '+regionOf(i+1).n:S.name),2.8);if(MODE!=='title')setTimeout(()=>{if(P&&P.hp>0)saveCk();},0);if(i%10!==9&&i<99)setTimeout(()=>{if(MODE==='play'&&stage===i)say('이 층 어딘가에 쪽지가 떨어져 있다 — 지도의 📜',2.6);},3200);}
 function enter(k,from){if(cur&&RS[curKey]===cur){cur.ents=ents;cur.items=items;}curKey=k;cur=RS[k];cur.seen=true;ents=cur.ents;items=cur.items;parts=[];FXS=[];fade=.25;if(hasR('shield'))P.shield=1;
  if(from==='u'){P.x=320;P.y=WB-10;}else if(from==='d'){P.x=320;P.y=WT+12;}else if(from==='l'){P.x=WR-10;P.y=170;}else if(from==='r'){P.x=WL+10;P.y=170;}else{P.x=320;P.y=250;}
  P.vx=P.vy=0;torches=TORCH.map(([x,y])=>({x,y}));
@@ -307,7 +307,7 @@ function hit(e,d,dir){if(e.hurt>0)return;e.hp-=d;e.hurt=.2;e.vx=dir.x*90;e.vy=di
 function blood(x,y,col,n){if(n>0)fx('blood',x+(Math.random()-.5)*4,y-6,.35,{fl:Math.random()<.5});}
 function isMe(){return isAdm();}
 function admPaint(){const a=$('pzAdm');if(!a)return;a.hidden=!isMe();a.style.display=isMe()?'flex':'none';const b=$('pzGod');if(b)b.textContent='⚜ 관리자 모드 · '+(godOn()?'켜짐':'꺼짐');}
-function admGod(){try{localStorage.setItem('b404_god',godOn()?'0':'1');}catch(e){}if(godOn())hasKey=true;admPaint();paintGod&&paintGod();}
+function admGod(){try{localStorage.setItem('b404_god',godOn()?'0':'1');}catch(e){}if(godOn()){hasKey=true;hasMap=true;}admPaint();paintGod&&paintGod();}
 function admResume(){$('pzM').classList.add('hide');MODE='play';showBtns(true);}
 function admKill(){if(!isMe())return;for(const e of ents)if(!e.dead){e.dead=true;kills++;}if(boss&&boss.hp>0){boss.hp=0;admResume();win();return;}admResume();say('⚜ 몬스터를 모두 처치했다',1.6);}
 function admNext(){if(!isMe()||stage+1>=404)return;const hp=P.hp,pots=P.pots,mx=P.max;admResume();load(stage+1);P.max=mx;P.hp=hp;P.pots=pots;}
@@ -463,7 +463,7 @@ function floorSnap(){try{if(!P||P.hp<=0||!RS||!cur||!FLOORS[stage])return null;i
  const rooms={};for(const k in RS){const R=RS[k];rooms[k]={s:R.seen?1:0,a:(R.ents||[]).filter(e=>!e.dead).length,it:(R.items||[]).filter(o=>o.t!=='coin'&&!o.got).map(cp),bd:R.bossDone?1:0,ts:R.trapSeen?1:0};}
  return {st:stage,F:FLOORS[stage],rooms,k:curKey,x:Math.round(P.x),y:Math.round(P.y),hk:hasKey?1:0,hm:hasMap?1:0,g:stGems,gt:stGemTotal,sh:P.shield?1:0,gd:gemDone._s===stage?1:0};}catch(e){return null;}}
 function floorRestore(fs){try{if(!fs||fs.st!==stage)return false;for(const k in fs.rooms){const R=RS[k],r=fs.rooms[k];if(!R)continue;R.seen=!!r.s;R.ents=(R.ents||[]).slice(0,r.a);R.items=r.it||[];R.bossDone=!!r.bd;R.trapSeen=!!r.ts;}
- hasKey=!!fs.hk;hasMap=!!fs.hm||hasR('eye');stGems=fs.g||0;stGemTotal=fs.gt||stGemTotal;P.shield=fs.sh?1:0;if(fs.gd)gemDone._s=stage;
+ hasKey=!!fs.hk;hasMap=!!fs.hm||hasR('eye')||godOn();stGems=fs.g||0;stGemTotal=fs.gt||stGemTotal;P.shield=fs.sh?1:0;if(fs.gd)gemDone._s=stage;
  curKey='';cur=null;enter(fs.k in RS?fs.k:getFloor(stage).start,null);P.x=fs.x;P.y=fs.y;cam.x=Math.max(0,Math.min(RW-VW,P.x-VW/2));cam.y=Math.max(0,Math.min(RH-VH,P.y-VH/2));return true;}catch(e){return false;}}
 setInterval(()=>{try{if(MODE==='play'&&P&&P.hp>0){saveCk._nc=1;saveCk();saveCk._nc=0;}}catch(e){saveCk._nc=0;}},4000);
 function loadCk(){try{return JSON.parse(localStorage.getItem('b404_save')||'null');}catch(e){return null;}}
