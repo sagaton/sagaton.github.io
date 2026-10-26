@@ -285,8 +285,10 @@ function bgmEl(k){if(BGM.els[k])return BGM.els[k];const a=new Audio('bgm/'+k+'.m
 function bgmFade(o,v,t){try{if(o.gn){const g=o.gn.gain,n=AC.currentTime;g.cancelScheduledValues(n);g.setValueAtTime(g.value,n);g.linearRampToValueAtTime(v,n+t);}else o.a.volume=v;}catch(e){}}
 function bgmPlay(k,fresh){if(!AC)return;const o=bgmEl(k);if(BGM.cur===o)return;const old=BGM.cur;BGM.cur=o;if(old){bgmFade(old,0,1.5);setTimeout(()=>{if(BGM.cur!==old)old.a.pause();},1700);}if(!BGM.on)return;if(fresh||o.a.ended)o.a.currentTime=0;o.a.play().catch(()=>{});bgmFade(o,BGV,1.5);}
 function bgmNext(){BGM.i=(BGM.i+1)%BGM.list.length;bgmPlay(BGM.list[BGM.i],true);}
-function bgmTick(){if(!AC||!BGM.started||!BGM.on||document.hidden)return;const bossOn=!!(boss&&boss.hp>0&&MODE!=='title');if(bossOn){if(!BGM.cur||BGM.cur.k!=='boss')bgmPlay('boss',true);}else if(!BGM.cur||BGM.cur.k==='boss')bgmPlay(BGM.list[BGM.i]);}
+function bgmTick(){if(!AC||!BGM.started||!BGM.on||document.hidden)return;try{if(AC.state!=='running')AC.resume();}catch(e){}if(BGM.cur&&BGM.cur.a.paused&&!BGM.cur.a.ended)BGM.cur.a.play().catch(()=>{});const bossOn=!!(boss&&boss.hp>0&&MODE!=='title');if(bossOn){if(!BGM.cur||BGM.cur.k!=='boss')bgmPlay('boss',true);}else if(!BGM.cur||BGM.cur.k==='boss')bgmPlay(BGM.list[BGM.i]);}
 setInterval(bgmTick,400);
+function bgmUnlock(){if(!AC)return;try{if(AC.state!=='running')AC.resume();}catch(e){}if(!BGM.on)return;if(!BGM.unl){BGM.unl=1;for(const k of BGM.list.concat(['boss'])){const o=bgmEl(k);if(o!==BGM.cur){o.a.play().then(()=>{if(BGM.cur!==o)o.a.pause();}).catch(()=>{});}}}if(BGM.cur&&BGM.cur.a.paused)BGM.cur.a.play().catch(()=>{});}
+['pointerdown','touchend','keydown'].forEach(ev=>addEventListener(ev,bgmUnlock,{passive:true}));
 function bgmToggle(){BGM.on=!BGM.on;try{localStorage.setItem('b404_bgm',BGM.on?'1':'0');}catch(e){}if(!BGM.on&&BGM.cur){const o=BGM.cur;bgmFade(o,0,.4);setTimeout(()=>o.a.pause(),450);BGM.cur=null;}else if(BGM.on){BGM.started=true;bgmTick();}bgmLabel();}
 function bgmLabel(){const b=document.getElementById('pzBgm');if(b)b.textContent='배경음악 · '+(BGM.on?'켜짐':'꺼짐');}
 document.addEventListener('visibilitychange',()=>{const o=BGM.cur;if(!o)return;if(document.hidden)o.a.pause();else if(BGM.on){try{AC&&AC.resume();}catch(e){}o.a.play().catch(()=>{});}});
