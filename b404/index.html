@@ -864,7 +864,7 @@ function fullTog(){if(fsEl())fsOff();else if(fsCan())fsOn();else fullHelp();setT
 function fullLbl(){const b=document.getElementById('cFull');if(b)b.textContent=fsEl()?'⛶ 전체 화면 끄기':'⛶ 전체 화면';}
 document.addEventListener('fullscreenchange',fullLbl);document.addEventListener('webkitfullscreenchange',fullLbl);
 const STANDALONE=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone;
-if(STANDALONE){const b=document.getElementById('cFull');if(b){b.textContent='↻ 새로고침';b.onclick=()=>location.reload();}}
+if(STANDALONE){const b=document.getElementById('cFull');if(b)b.style.display='none';}
 function fullHelp(){let d=document.getElementById('fsHelp');if(!d){d=document.createElement('div');d.id='fsHelp';d.className='scr';d.style.zIndex=60;d.style.background='rgba(8,6,12,.95)';d.innerHTML='<h2 style="margin:0">전체 화면으로 하기</h2><p style="max-width:420px;line-height:1.9;font-size:14px">이 기기의 사파리는 버튼으로 전체 화면을 켤 수 없어요.<br>대신 <b>공유 버튼 ⬆ → 「홈 화면에 추가」</b>를 누르면<br>홈 화면 아이콘으로 열 때 주소창 없이 꽉 찬 화면으로 열려요.</p><button class="btn" onclick="this.parentNode.classList.add(\'hide\')">알겠어요</button>';document.body.appendChild(d);}d.classList.remove('hide');}
 $('go').addEventListener('click',()=>{if(!fsEl()&&fsCan()&&matchMedia('(pointer:coarse)').matches)fsOn();});
 $('go').onclick=openSel;$('cont').onclick=cont;document.querySelectorAll('.hb').forEach(b=>b.onclick=()=>{HSEL=b.dataset.h;HERO=HEROES[HSEL];document.querySelectorAll('.hb').forEach(x=>x.classList.toggle('on',x===b));paintHero();});
